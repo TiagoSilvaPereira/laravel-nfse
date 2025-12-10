@@ -8,4 +8,4 @@
 
 ## Criar projeto Laravel + API (com autenticação)
 
-## Instalar pacotes necessários
+## Criar migrations
