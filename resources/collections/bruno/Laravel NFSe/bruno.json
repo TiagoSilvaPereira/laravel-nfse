@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Laravel NFSe",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
