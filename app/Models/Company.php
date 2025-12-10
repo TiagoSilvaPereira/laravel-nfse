@@ -31,6 +31,10 @@ class Company extends Model
         'last_dps_number' => 'integer',
     ];
 
+    protected $hidden = [
+        'cert_password',
+    ];
+
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
