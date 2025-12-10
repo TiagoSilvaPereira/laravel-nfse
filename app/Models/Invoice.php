@@ -4,10 +4,13 @@ namespace App\Models;
 
 use App\Enums\NfseEnvironment;
 use App\Enums\NfseStatus;
+use App\Observers\InvoiceObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[ObservedBy([InvoiceObserver::class])]
 class Invoice extends Model
 {
     use HasFactory;
