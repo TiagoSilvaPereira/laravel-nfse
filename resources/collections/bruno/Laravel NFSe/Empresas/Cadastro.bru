@@ -6,8 +6,14 @@ meta {
 
 post {
   url: {{baseUrl}}/companies
-  body: none
+  body: multipartForm
   auth: inherit
+}
+
+body:multipart-form {
+  name: {{companyName}}
+  certificate: @file(C:\certificates\cert.pfx)
+  cert_password: {{certificatePassword}}
 }
 
 settings {
