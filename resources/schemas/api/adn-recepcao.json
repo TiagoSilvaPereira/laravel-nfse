@@ -1,0 +1,235 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API NFS-e - ADN Recepção",
+    "description": " # Apresentação\n Bem-vindo a documentação técnica da API do Projeto Nota Fiscal de Serviços Eletrônica (NFS-e) que trata a recepção de documentos compartilhados no ambiente nacional (ADN).\n\n Aqui você encontrará informações detalhadas sobre os endpoints, parâmetros, respostas e exemplos de uso.\n",
+    "version": "v1",
+    "x-logo": {
+      "url": "/adn/images/logo_nfse_vertical.png",
+      "altText": "NFS-e",
+      "backgroundColor": "#FFFFFF"
+    }
+  },
+  "servers": [
+    {
+      "url": "/adn"
+    }
+  ],
+  "paths": {
+    "/DFe": {
+      "post": {
+        "tags": [
+          "Recepcao"
+        ],
+        "summary": "Recepciona um lote de Documentos",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecepcaoRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecepcaoResponseLote"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecepcaoResponseLote"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecepcaoResponseLote"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecepcaoResponseLote"
+                }
+              },
+              "text/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecepcaoResponseLote"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RecepcaoRequest": {
+        "type": "object",
+        "properties": {
+          "LoteXmlGZipB64": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Enum": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "MensagemProcessamento": {
+        "type": "object",
+        "properties": {
+          "Mensagem": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Enum"
+              }
+            ],
+            "nullable": true
+          },
+          "Parametros": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "Codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "Descricao": {
+            "type": "string",
+            "nullable": true
+          },
+          "Complemento": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecepcaoResponseDocumento": {
+        "type": "object",
+        "properties": {
+          "ChaveAcesso": {
+            "type": "string",
+            "description": "Chave de acesso",
+            "nullable": true
+          },
+          "NsuRecepcao": {
+            "type": "string",
+            "description": "NSU - Número Sequencial de Busca",
+            "nullable": true
+          },
+          "StatusProcessamento": {
+            "type": "string",
+            "description": "Status do processamento",
+            "nullable": true
+          },
+          "Alertas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MensagemProcessamento"
+            },
+            "description": "Alertas da NFS-e",
+            "nullable": true,
+            "readOnly": true
+          },
+          "Erros": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MensagemProcessamento"
+            },
+            "description": "Erros da NFS-e gerada",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TipoAmbiente": {
+        "enum": [
+          "PRODUCAO",
+          "HOMOLOGACAO"
+        ],
+        "type": "string"
+      },
+      "RecepcaoResponseLote": {
+        "type": "object",
+        "properties": {
+          "Lote": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecepcaoResponseDocumento"
+            },
+            "description": "Lote de documentos processados",
+            "nullable": true
+          },
+          "TipoAmbiente": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TipoAmbiente"
+              }
+            ]
+          },
+          "VersaoAplicativo": {
+            "type": "string",
+            "nullable": true
+          },
+          "DataHoraProcessamento": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      }
+    }
+  }
+}
