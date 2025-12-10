@@ -2,9 +2,13 @@
 
 ## Introdução
 
+## Ciclo de vida da NFS-e (DPS, NFS-e, eventos, etc)
+
 ## Obtenção do certificado digital
 
 ## Corrigindo problemas com certificado com algoritmo legado
+
+Criar também um utilitário para corrigir certificados com algoritmos legados.
 
 ## Criar projeto Laravel + API (com autenticação)
 
@@ -18,3 +22,15 @@ protected $casts = [
     'cert_password' => 'encrypted',
 ];
 ```
+
+## Criar rotas para cadastrar empresa emissora e enviar certificado
+
+## Criar o serviço para lidar com certificados
+
+## Criar o serviço de assinatura do XML
+
+## Criar o serviço que monta o XML da DPS
+
+## Utilitário para corrigir certificado
+
+## Autenticação na API
