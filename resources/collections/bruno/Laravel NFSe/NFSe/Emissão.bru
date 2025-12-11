@@ -1,0 +1,32 @@
+meta {
+  name: Emissão
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/nfse
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "company_id": 1,
+      "customer": {
+          "name": "{{customerName}}",
+          "cpfCnpj": "{{customerCpfCnpj}}"
+      },
+      "service": {
+          "code": "01.01.01",
+          "description": "Desenvolvimento de Software",
+          "amount": 1500.00,
+          "tax_rate": 2.0
+      }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
