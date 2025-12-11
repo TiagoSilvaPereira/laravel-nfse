@@ -33,6 +33,65 @@ protected $casts = [
 
 ## Utilitário para corrigir certificado
 
+## Emails
+
+- Email de nota emitida para o tomador com link para a NFS-e
+- Email diário ou semanal ou mensal com relatórios de notas com falha
+- Email diário ou semanal ou mensal com relatórios de notas emitidas
+- Email de notificação de vencimento do certificado (30, 15, 7, 3, 1 dias antes)
+
 ## Autenticação na API
 
-## Lista de cidades
+## Lista de cidades (banco) e lista de países (config)
+
+## Emissão sem o Mapper
+
+```php
+$dadosNota = [
+    'tomador' => [
+        'cpfCnpj' => '12345678900', // Ou nif => '...' se exterior
+        'xNome' => 'Fulano de Tal',
+        'endereco' => [
+            'xLgr' => 'Rua Teste',
+            'nro' => '123',
+            'cPais' => '1058', // 1058 = Brasil
+            'cMun' => '3550308', // Código IBGE (SP)
+            // ...
+        ]
+    ],
+    'servico' => [
+        'cTribNac' => '010101', // Código de tributação
+        'xDescServ' => 'Desenvolvimento de Software',
+        'cLocPrestacao' => '3550308',
+    ],
+    'valores' => [
+        'vServ' => 100.00,
+        'pAliq' => 2.00,
+    ]
+];
+```
+
+## Emissão com o Mapper
+
+```json
+{
+    "company_id": 1,
+    "customer": {
+        "name": "João da Silva",
+        "document": "12345678900",
+        "address": {
+            "street": "Av. Paulista",
+            "number": "1000",
+            "district": "Bela Vista",
+            "city_code": "3550308",
+            "zip_code": "01310100"
+        }
+    },
+    "service": {
+        "code": "01.07.01",
+        "description": "Consultoria em TI",
+        "amount": 1500.00,
+        "tax_rate": 2.0
+    }
+}
+```

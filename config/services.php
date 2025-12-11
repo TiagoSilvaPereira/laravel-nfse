@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'nfse' => [
+        'sefin_url' => env('NFSE_SEFIN_URL', 'https://sefin.nfse.gov.br/SefinNacional'),
+        'sefin_url_homologation' => env('NFSE_SEFIN_URL_HOMOLOGATION', 'https://sefin.producaorestrita.nfse.gov.br/SefinNacional'),
+        'adn_url' => env('NFSE_ADN_URL', 'https://adn.nfse.gov.br'),
+        'adn_url_homologation' => env('NFSE_ADN_URL_HOMOLOGATION', 'https://adn.producaorestrita.nfse.gov.br'),
+    ],
+
 ];

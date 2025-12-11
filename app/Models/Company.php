@@ -39,4 +39,14 @@ class Company extends Model
     {
         return $this->hasMany(Invoice::class);
     }
+
+    public function isProduction(): bool
+    {
+        return $this->environment === NfseEnvironment::PRODUCTION;
+    }
+
+    public function isHomologation(): bool
+    {
+        return $this->environment === NfseEnvironment::HOMOLOGATION;
+    }
 }

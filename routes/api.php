@@ -9,3 +9,5 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::apiResource('companies', CompanyController::class);
+
+Route::post('nfse', [App\Http\Controllers\Api\InvoiceController::class, 'store']);

@@ -29,7 +29,7 @@ class CompanyController extends Controller
             $request->file('certificate')
         );
 
-        return new CompanyResource($company);
+        return new CompanyResource($company->refresh());
     }
 
     public function show(Company $company): JsonResource
