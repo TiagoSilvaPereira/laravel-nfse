@@ -49,4 +49,13 @@ class Company extends Model
     {
         return $this->environment === NfseEnvironment::HOMOLOGATION;
     }
+
+    public function hasInvoiceByIntegrationId(string $integrationId): bool
+    {
+        if (empty($integrationId)) {
+            return false;
+        }
+
+        return $this->invoices()->where('integration_id', $integrationId)->exists();
+    }
 }
