@@ -34,3 +34,5 @@ protected $casts = [
 ## Utilitário para corrigir certificado
 
 ## Autenticação na API
+
+## Lista de cidades
