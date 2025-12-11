@@ -15,6 +15,7 @@ class StoreInvoiceRequest extends FormRequest
     {
         return [
             'company_id' => ['required', 'exists:companies,id'],
+            'integration_id' => ['nullable', 'string', 'max:48'],
             
             // Tomador
             'customer' => ['required', 'array'],

@@ -4,6 +4,10 @@
 
 ## Ciclo de vida da NFS-e (DPS, NFS-e, eventos, etc)
 
+Detalhes sobre a DPS (Documento Provisório de Serviço), que é o documento inicial, e depois a NFS-e que é o documento final.
+
+O número da DPS documenta as tentativas de emissão, e a NFS-e é o documento oficial. Ou seja, o controle da DPS é feito totalmente pelo sistema emissor, e a NFS-e é o documento que tem validade fiscal.
+
 ## Obtenção do certificado digital
 
 ## Corrigindo problemas com certificado com algoritmo legado
@@ -13,6 +17,8 @@ Criar também um utilitário para corrigir certificados com algoritmos legados.
 ## Criar projeto Laravel + API (com autenticação)
 
 ## Criar migrations
+
+Explicar sobre idempotência de notas fiscais, e também a necessidade do id de integração com o sistema externo, para evitar duplicidade.
 
 ## Criar models
 Senha do certificado deve ser encriptada no banco de dados, e por isso usamos o cast para isso. Veja o exemplo abaixo:

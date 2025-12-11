@@ -47,6 +47,7 @@ class EmitInvoice
             $invoice = Invoice::create([
                 'company_id' => $company->id,
                 'environment' => $company->environment,
+                'integration_id' => $data['integration_id'] ?? null,
                 'dps_id' => $dpsId,
                 'dps_number' => $dpsNumber,
                 'dps_series' => $company->dps_serie,

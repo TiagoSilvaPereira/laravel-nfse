@@ -21,9 +21,24 @@ class InvoiceController extends Controller
         
         $company = Company::findOrFail($data['company_id']);
 
+        if (!empty($data['integration_id'])) {
+            $existingInvoice = $company->invoices()
+                ->where('integration_id', $data['integration_id'])
+                ->first();
+
+            if ($existingInvoice) {
+                return response()->json([
+                    'message' => 'Nota fiscal já processada anteriormente.',
+                    'data' => $existingInvoice,
+                ], 200);
+            }
+        }
+
         $internalData = $mapper->toInternal($data);
 
         try {
+            $internalData['integration_id'] = $data['integration_id'] ?? null;
+
             $invoice = $emitInvoice->execute($company, $internalData);
             
             return response()->json([
