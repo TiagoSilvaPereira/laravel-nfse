@@ -7,35 +7,37 @@ use App\Actions\Company\UpdateCompany;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
+use App\Http\Resources\CompanyResource;
 use App\Models\Company;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(): JsonResource
     {
         $companies = Company::all();
 
-        return response()->json($companies);
+        return CompanyResource::collection($companies);
     }
 
-    public function store(StoreCompanyRequest $request, CreateCompany $action): JsonResponse
+    public function store(StoreCompanyRequest $request, CreateCompany $action): JsonResource
     {
         $company = $action->handle(
             $request->validated(),
             $request->file('certificate')
         );
 
-        return response()->json($company, 201);
+        return new CompanyResource($company);
     }
 
-    public function show(Company $company): JsonResponse
+    public function show(Company $company): JsonResource
     {
-        return response()->json($company);
+        return new CompanyResource($company);
     }
 
-    public function update(UpdateCompanyRequest $request, Company $company, UpdateCompany $action): JsonResponse
+    public function update(UpdateCompanyRequest $request, Company $company, UpdateCompany $action): JsonResource
     {
         $company = $action->handle(
             $company,
@@ -43,13 +45,13 @@ class CompanyController extends Controller
             $request->file('certificate')
         );
 
-        return response()->json($company);
+        return new CompanyResource($company);
     }
 
     public function destroy(Company $company): JsonResponse
     {
         $company->delete();
-        
+
         return response()->json(null, 204);
     }
 }
