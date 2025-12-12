@@ -7,6 +7,7 @@ enum NfseStatus: string
     case DRAFT = 'draft';
     case PROCESSING = 'processing';
     case AUTHORIZED = 'authorized';
+    case ERROR = 'error';
     case REJECTED = 'rejected';
     case CANCELLED = 'cancelled';
 }

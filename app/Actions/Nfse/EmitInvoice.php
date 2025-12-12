@@ -2,6 +2,7 @@
 
 namespace App\Actions\Nfse;
 
+use App\Enums\NfseStatus;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Services\Nfse\NfseTransmitter;
@@ -32,29 +33,58 @@ class EmitInvoice
     {
         $this->validator->validate($data);
 
-        return DB::transaction(function () use ($company, $data) {
-            $company->increment('last_dps_number');
-            $dpsNumber = $company->last_dps_number;
+        $integrationId = $data['integration_id'] ?? null;
+        $existingInvoice = null;
+
+        if ($integrationId) {
+            $existingInvoice = $company->invoices()
+                ->where('integration_id', $integrationId)
+                ->first();
+            
+            if ($existingInvoice && !in_array($existingInvoice->status, [NfseStatus::ERROR, NfseStatus::REJECTED])) {
+                return $existingInvoice;
+            }
+        }
+
+        return DB::transaction(function () use ($company, $data, $existingInvoice) {
+            if ($existingInvoice) {
+                $dpsNumber = $existingInvoice->dps_number;
+                $dpsSeries = $existingInvoice->dps_series;
+            } else {
+                $company->increment('last_dps_number');
+                $dpsNumber = $company->last_dps_number;
+                $dpsSeries = $company->dps_serie;
+            }
             
             $data['nDPS'] = $dpsNumber;
-            $data['serie'] = $company->dps_serie;
+            $data['serie'] = $dpsSeries;
 
             $xmlContent = $this->xmlBuilder->buildDpsXml($company, $data);
-            $dpsId = $this->xmlBuilder->generateDpsId($company, $dpsNumber, $company->dps_serie);
+            $dpsId = $this->xmlBuilder->generateDpsId($company, $dpsNumber, $dpsSeries);
 
             $signedXml = $this->signatureService->sign($xmlContent, $company);
 
-            $invoice = Invoice::create([
-                'company_id' => $company->id,
-                'environment' => $company->environment,
-                'integration_id' => $data['integration_id'] ?? null,
-                'dps_id' => $dpsId,
-                'dps_number' => $dpsNumber,
-                'dps_series' => $company->dps_serie,
-                'status' => \App\Enums\NfseStatus::PROCESSING,
-                'xml_dps_signed' => $signedXml,
-                'payload_json' => $data,
-            ]);
+            if ($existingInvoice) {
+                $invoice = $existingInvoice;
+                $invoice->update([
+                    'status' => \App\Enums\NfseStatus::PROCESSING,
+                    'xml_dps_signed' => $signedXml,
+                    'payload_json' => $data,
+                    'status_message' => null,
+                ]);
+            } else {
+                $invoice = Invoice::create([
+                    'company_id' => $company->id,
+                    'environment' => $company->environment,
+                    'integration_id' => $data['integration_id'] ?? null,
+                    'dps_id' => $dpsId,
+                    'dps_number' => $dpsNumber,
+                    'dps_series' => $dpsSeries,
+                    'status' => \App\Enums\NfseStatus::PROCESSING,
+                    'xml_dps_signed' => $signedXml,
+                    'payload_json' => $data,
+                ]);
+            }
 
             try {
                 $response = $this->transmitter->transmit($signedXml, $company);
@@ -66,7 +96,7 @@ class EmitInvoice
                 ]);
             } catch (Exception $e) {
                 $invoice->update([
-                    'status' => \App\Enums\NfseStatus::REJECTED,
+                    'status' => \App\Enums\NfseStatus::ERROR,
                     'status_message' => $e->getMessage(),
                 ]);
             }

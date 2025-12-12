@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\Nfse\EmitInvoice;
+use App\Enums\NfseStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreInvoiceRequest;
 use App\Models\Company;
@@ -20,13 +21,6 @@ class InvoiceController extends Controller
         $data = $request->validated();
         
         $company = Company::findOrFail($data['company_id']);
-
-        if ($company->hasInvoiceByIntegrationId($data['integration_id'])) {
-            return response()->json([
-                'message' => 'DPS já enviada para esta integração.',
-            ], 200);
-        }
-
         $internalData = $mapper->toInternal($data);
 
         try {
@@ -37,7 +31,7 @@ class InvoiceController extends Controller
             return response()->json([
                 'message' => 'Nota fiscal processada com sucesso.',
                 'data' => $invoice,
-            ], 201);
+            ], $invoice->wasRecentlyCreated ? 201 : 200);
 
         } catch (\Exception $e) {
             return response()->json([
