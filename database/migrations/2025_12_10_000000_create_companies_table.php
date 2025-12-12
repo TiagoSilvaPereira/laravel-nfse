@@ -22,7 +22,7 @@ return new class extends Migration
 
             $table->tinyInteger('environment')->default(NfseEnvironment::HOMOLOGATION);
             $table->unsignedBigInteger('last_dps_number')->default(0);
-            $table->string('dps_serie', 5)->default('00001');
+            $table->string('dps_series', 5)->default('00001');
             
             $table->timestamps();
         });

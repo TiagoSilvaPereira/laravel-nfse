@@ -23,7 +23,7 @@ class CompanyResource extends JsonResource
             'environment' => $this->environment,
             'cert_expires_at' => $this->cert_expires_at,
             'last_dps_number' => $this->last_dps_number,
-            'dps_serie' => $this->dps_serie,
+            'dps_series' => $this->dps_series,
             'has_certificate' => !empty($this->cert_path),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

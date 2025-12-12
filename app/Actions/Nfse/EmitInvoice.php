@@ -33,75 +33,117 @@ class EmitInvoice
     {
         $this->validator->validate($data);
 
-        $integrationId = $data['integration_id'] ?? null;
-        $existingInvoice = null;
+        $existingInvoice = $this->findExistingInvoice($company, $data['integration_id'] ?? null);
 
-        if ($integrationId) {
-            $existingInvoice = $company->invoices()
-                ->where('integration_id', $integrationId)
-                ->first();
-            
-            if ($existingInvoice && !in_array($existingInvoice->status, [NfseStatus::ERROR, NfseStatus::REJECTED])) {
-                return $existingInvoice;
-            }
+        if ($this->shouldReturnExisting($existingInvoice)) {
+            return $existingInvoice;
         }
 
-        return DB::transaction(function () use ($company, $data, $existingInvoice) {
-            if ($existingInvoice) {
-                $dpsNumber = $existingInvoice->dps_number;
-                $dpsSeries = $existingInvoice->dps_series;
-            } else {
-                $company->increment('last_dps_number');
-                $dpsNumber = $company->last_dps_number;
-                $dpsSeries = $company->dps_serie;
-            }
+        return DB::transaction(fn () => $this->processEmission($company, $data, $existingInvoice));
+    }
+
+    protected function findExistingInvoice(Company $company, ?string $integrationId): ?Invoice
+    {
+        if (!$integrationId) {
+            return null;
+        }
+
+        return $company->invoices()
+            ->where('integration_id', $integrationId)
+            ->first();
+    }
+
+    protected function shouldReturnExisting(?Invoice $invoice): bool
+    {
+        if (!$invoice) {
+            return false;
+        }
+
+        return !in_array($invoice->status, [NfseStatus::ERROR, NfseStatus::REJECTED]);
+    }
+
+    protected function processEmission(Company $company, array $data, ?Invoice $existingInvoice): Invoice
+    {
+        $dpsInfo = $this->resolveDpsInfo($company, $existingInvoice);
+        
+        $data['nDPS'] = $dpsInfo['number'];
+        $data['serie'] = $dpsInfo['series'];
+
+        $xmlContent = $this->xmlBuilder->buildDpsXml($company, $data);
+
+        $dpsId = $this->xmlBuilder->generateDpsId($company, $dpsInfo['number'], $dpsInfo['series']);
+        
+        $signedXml = $this->signatureService->sign($xmlContent, $company);
+
+        $invoice = $this->persistInvoice($company, $data, $dpsId, $signedXml, $dpsInfo, $existingInvoice);
+
+        $this->transmitAndUpdateStatus($invoice, $company, $signedXml);
+
+        return $invoice;
+    }
+
+    protected function resolveDpsInfo(Company $company, ?Invoice $existingInvoice): array
+    {
+        if ($existingInvoice) {
+            return [
+                'number' => $existingInvoice->dps_number,
+                'series' => $existingInvoice->dps_series,
+            ];
+        }
+
+        $company->increment('last_dps_number');
+
+        return [
+            'number' => $company->last_dps_number,
+            'series' => $company->dps_series,
+        ];
+    }
+
+    protected function persistInvoice(
+        Company $company, 
+        array $data, 
+        string $dpsId, 
+        string $signedXml, 
+        array $dpsInfo, 
+        ?Invoice $existingInvoice
+    ): Invoice {
+        $attributes = [
+            'status' => NfseStatus::PROCESSING,
+            'xml_dps_signed' => $signedXml,
+            'payload_json' => $data,
+            'status_message' => null, // Limpa mensagem de erro anterior se houver
+        ];
+
+        if ($existingInvoice) {
+            $existingInvoice->update($attributes);
+            return $existingInvoice;
+        }
+
+        return Invoice::create(array_merge($attributes, [
+            'company_id' => $company->id,
+            'environment' => $company->environment,
+            'integration_id' => $data['integration_id'] ?? null,
+            'dps_id' => $dpsId,
+            'dps_number' => $dpsInfo['number'],
+            'dps_series' => $dpsInfo['series'],
+        ]));
+    }
+
+    protected function transmitAndUpdateStatus(Invoice $invoice, Company $company, string $signedXml): void
+    {
+        try {
+            $response = $this->transmitter->transmit($signedXml, $company);
             
-            $data['nDPS'] = $dpsNumber;
-            $data['serie'] = $dpsSeries;
-
-            $xmlContent = $this->xmlBuilder->buildDpsXml($company, $data);
-            $dpsId = $this->xmlBuilder->generateDpsId($company, $dpsNumber, $dpsSeries);
-
-            $signedXml = $this->signatureService->sign($xmlContent, $company);
-
-            if ($existingInvoice) {
-                $invoice = $existingInvoice;
-                $invoice->update([
-                    'status' => \App\Enums\NfseStatus::PROCESSING,
-                    'xml_dps_signed' => $signedXml,
-                    'payload_json' => $data,
-                    'status_message' => null,
-                ]);
-            } else {
-                $invoice = Invoice::create([
-                    'company_id' => $company->id,
-                    'environment' => $company->environment,
-                    'integration_id' => $data['integration_id'] ?? null,
-                    'dps_id' => $dpsId,
-                    'dps_number' => $dpsNumber,
-                    'dps_series' => $dpsSeries,
-                    'status' => \App\Enums\NfseStatus::PROCESSING,
-                    'xml_dps_signed' => $signedXml,
-                    'payload_json' => $data,
-                ]);
-            }
-
-            try {
-                $response = $this->transmitter->transmit($signedXml, $company);
-                
-                $invoice->update([
-                    'status' => \App\Enums\NfseStatus::AUTHORIZED,
-                    'status_message' => 'Autorizada com sucesso',
-                    // 'xml_nfse' => 
-                ]);
-            } catch (Exception $e) {
-                $invoice->update([
-                    'status' => \App\Enums\NfseStatus::ERROR,
-                    'status_message' => $e->getMessage(),
-                ]);
-            }
-
-            return $invoice;
-        });
+            $invoice->update([
+                'status' => NfseStatus::AUTHORIZED,
+                'status_message' => 'Autorizada com sucesso',
+                // 'xml_nfse' => ... extrair do retorno
+            ]);
+        } catch (Exception $e) {
+            $invoice->update([
+                'status' => NfseStatus::ERROR, // Ou REJECTED dependendo do erro
+                'status_message' => $e->getMessage(),
+            ]);
+        }
     }
 }

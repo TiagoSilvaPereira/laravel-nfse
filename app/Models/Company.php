@@ -21,7 +21,7 @@ class Company extends Model
         'cert_expires_at',
         'environment',
         'last_dps_number',
-        'dps_serie',
+        'dps_series',
     ];
 
     protected $casts = [

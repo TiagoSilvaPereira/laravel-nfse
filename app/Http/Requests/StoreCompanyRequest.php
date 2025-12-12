@@ -23,7 +23,7 @@ class StoreCompanyRequest extends FormRequest
             'environment' => ['required', Rule::enum(NfseEnvironment::class)],
             'certificate' => ['required', 'file', 'mimetypes:application/x-pkcs12,application/octet-stream', 'extensions:pfx,p12', 'max:1024'],
             'cert_password' => ['required', 'string'],
-            'dps_serie' => ['nullable', 'string', 'max:5'],
+            'dps_series' => ['nullable', 'string', 'max:5'],
             'last_dps_number' => ['nullable', 'integer', 'min:0'],
         ];
     }
