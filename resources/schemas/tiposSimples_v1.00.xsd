@@ -155,7 +155,7 @@
   <xs:simpleType name="TSSerieDPS">
 	<xs:restriction base="xs:string">
 		<xs:maxLength value="5"/>
-		<xs:pattern value="[0-9]{1,5}"/>
+		<xs:pattern value="^(?!0{1,5}$)\d{1,5}$"/>
 		<xs:whiteSpace value="preserve"/>
 	</xs:restriction>
   </xs:simpleType>

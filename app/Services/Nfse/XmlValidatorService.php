@@ -4,6 +4,7 @@ namespace App\Services\Nfse;
 
 use Exception;
 use DOMDocument;
+use Illuminate\Support\Facades\File;
 
 class XmlValidatorService
 {
@@ -25,20 +26,25 @@ class XmlValidatorService
         libxml_clear_errors();
         libxml_use_internal_errors($previous);
 
-        $schemaPath = resource_path('schemas/DPS_v1.00.xsd');
+        $sourcePath = resource_path('schemas');
+        $cachePath = storage_path('app/schemas_cache');
+        $mainSchema = 'DPS_v1.00.xsd';
 
-        if (!file_exists($schemaPath)) {
-            throw new Exception("Arquivo XSD não encontrado em: $schemaPath");
+        $this->prepareSchemas($sourcePath, $cachePath);
+
+        $schemaFile = $cachePath . DIRECTORY_SEPARATOR . $mainSchema;
+
+        if (!file_exists($schemaFile)) {
+            throw new Exception("Arquivo XSD não encontrado em: $schemaFile");
         }
 
-        // Muda o diretório de trabalho para a pasta dos schemas para resolver includes relativos corretamente
         $originalDir = getcwd();
-        chdir(dirname($schemaPath));
+        chdir($cachePath);
 
         try {
             libxml_use_internal_errors(true);
 
-            if (!$dom->schemaValidate(basename($schemaPath))) {
+            if (!$dom->schemaValidate($mainSchema)) {
                 $errors = libxml_get_errors();
                 $messages = [];
                 foreach ($errors as $error) {
@@ -49,12 +55,41 @@ class XmlValidatorService
                 throw new Exception("Erro de validação do Schema XSD: " . implode(' | ', $messages));
             }
         } finally {
-            // Restaura o diretório original
             if ($originalDir) {
                 chdir($originalDir);
             }
-            
             libxml_use_internal_errors($previous);
+        }
+    }
+
+    /**
+     * Esse método é necessário pois o PHP não suporta alguns tipos de Regex no XSD, então
+     * fazemos uma cópia local dos schemas e aplicamos as correções necessárias, sem 
+     * modificar os arquivos originais.
+     * @param string $source 
+     * @param string $destination 
+     * @return void 
+     */
+    private function prepareSchemas(string $source, string $destination): void
+    {
+        if (!File::exists($destination)) {
+            File::ensureDirectoryExists($destination);
+            File::copyDirectory($source, $destination);
+
+            
+            $fileToFix = $destination . DIRECTORY_SEPARATOR . 'tiposSimples_v1.00.xsd';
+
+            if (File::exists($fileToFix)) {
+                $content = File::get($fileToFix);
+                
+                $content = str_replace(
+                    'pattern value="^(?!0{1,5}$)\d{1,5}$"',
+                    'pattern value="[0-9]{1,5}"',
+                    $content
+                );
+
+                File::put($fileToFix, $content);
+            }
         }
     }
 }

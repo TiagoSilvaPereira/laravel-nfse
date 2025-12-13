@@ -111,6 +111,18 @@ $dadosNota = [
 
 ## Erros comuns e como resolver
 
+### DOMDocument::schemaValidate(): Invalid Schema
+
+Verifique se o arquivo XSD está correto e acessível no caminho especificado. Além disso, confira se o XML está bem formado antes de validar contra o schema. Outra causa é a existência de RegEx no XSD que não são suportadas pelo PHP (ex: lookahead, lookbehind, etc). Nesse caso, será necessário ajustar o XSD para remover essas expressões. Ex:
+
+```xml
+<xs:pattern value="^(?!0{1,5}$)\d{1,5}$"/>
+deve ser alterado para
+<xs:pattern value="[0-9]{1,5}"/>
+```
+
+> Outra opção é remover a validação do schema, mas isso não é recomendado.
+
 ### [RNG9999] Erro não catalogado
 
 Verifique se está enviando a propriedade correta no payload. Por exemplo, se o serviço espera `dpsXmlGZipB64` e você está enviando `nfseXmlGZipB64`, ocorrerá esse erro.

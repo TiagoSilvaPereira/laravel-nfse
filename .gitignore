@@ -6,6 +6,7 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/app/schemas_cache
 /resources/js/actions
 /resources/js/routes
 /resources/js/wayfinder
