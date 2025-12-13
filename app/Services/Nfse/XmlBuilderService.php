@@ -2,32 +2,39 @@
 
 namespace App\Services\Nfse;
 
-use App\Models\Company;
+use App\Services\Nfse\Concerns\HasCompany;
 use Carbon\Carbon;
 use Spatie\ArrayToXml\ArrayToXml;
 
 class XmlBuilderService
 {
-    public function buildDpsXml(Company $company, array $data): string
+    use HasCompany;
+
+    public function buildDpsXml(array $data): string
     {
         $dpsNumber = $data['nDPS'];
         $dpsSeries = $data['serie'];
         
         $issueDate = Carbon::now()->setTimezone('America/Sao_Paulo')->format('Y-m-d\TH:i:sP');
 
-        $infDpsId = $this->generateDpsId($company, $dpsNumber, $dpsSeries);
+        $infDpsId = $this->generateDpsId($dpsNumber, $dpsSeries);
 
         $dpsArray = [
             'infDPS' => [
                 '_attributes' => [
                     'Id' => $infDpsId,
                 ],
-                'tpAmb' => $company->environment->value,
+                'tpAmb' => $this->company->environment->value,
                 'dhEmi' => $issueDate,
                 'verAplic' => 'LaravelNFSe_v1.0',
+                'serie' => $dpsSeries,
+                'nDPS' => $dpsNumber,
                 'dCompet' => Carbon::now()->format('Y-m-d'),
+                'tpEmit' => '1',  // Emissão normal
+                // 'cMotivoEmisTI' => '1',  // Motivo de emissão TI (1 = Normal; opcional mas listado, use 1 para testes) - só preenche se o emitente for diferente do prestador
+                'cLocEmi' => $this->company->municipality_code,
                 'prest' => [
-                    'CNPJ' => preg_replace('/\D/', '', $company->cnpj),
+                    'CNPJ' => preg_replace('/\D/', '', $this->company->cnpj),
                     'regTrib' => [
                         'opSimpNac' => 3, // 3 - Optante - Microempresa ou Empresa de Pequeno Porte (ME/EPP)
                         'regApTribSN' => 1,
@@ -51,12 +58,12 @@ class XmlBuilderService
         return $xml;
     }
 
-    public function generateDpsId(Company $company, int $dpsNumber, string $dpsSeries): string
+    public function generateDpsId(int $dpsNumber, string $dpsSeries): string
     {
         // ID = "DPS" + CMun(7) + TipoInscr(1) + CNPJ(14) + Serie(5) + Numero(15)
         $tipoInscr = '2'; // CNPJ
-        $cMun = $company->municipality_code;
-        $cnpj = preg_replace('/\D/', '', $company->cnpj);
+        $cMun = $this->company->municipality_code;
+        $cnpj = preg_replace('/\D/', '', $this->company->cnpj);
         $cnpj = str_pad($cnpj, 14, '0', STR_PAD_LEFT);
         $serie = str_pad($dpsSeries, 5, '0', STR_PAD_LEFT);
         $nDps = str_pad($dpsNumber, 15, '0', STR_PAD_LEFT);
@@ -103,7 +110,7 @@ class XmlBuilderService
     {
         $serv = [
             'locPrest' => [
-                'cLocPrestacao' => $data['servico']['cLocPrestacao'] ?? null,
+                'cLocPrestacao' => $this->company->municipality_code,
             ],
             'cServ' => [
                 'cTribNac' => $data['servico']['cTribNac'], // Código de Tributação Nacional

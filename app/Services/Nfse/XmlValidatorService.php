@@ -53,6 +53,7 @@ class XmlValidatorService
             if ($originalDir) {
                 chdir($originalDir);
             }
+            
             libxml_use_internal_errors($previous);
         }
     }

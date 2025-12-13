@@ -2,7 +2,7 @@
 
 namespace App\Services\Nfse;
 
-use App\Models\Company;
+use App\Services\Nfse\Concerns\HasCompany;
 use DOMDocument;
 use Exception;
 use Illuminate\Support\Facades\Storage;
@@ -11,24 +11,23 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class SignatureService
 {
+    use HasCompany;
+
     /**
      * Assina o XML da DPS.
      *
      * @param string $xmlContent O conteúdo XML a ser assinado.
-     * @param Company $company A empresa emissora (contém o certificado).
      * @return string O XML assinado.
      * @throws Exception
      */
-    public function sign(string $xmlContent, Company $company): string
+    public function sign(string $xmlContent): string
     {
-        \Log::info("Conteúdo XML antes da assinatura: " . $xmlContent);
-
-        if (!Storage::exists($company->cert_path)) {
-            throw new Exception("Certificado não encontrado em: {$company->cert_path}");
+        if (!Storage::exists($this->company->cert_path)) {
+            throw new Exception("Certificado não encontrado em: {$this->company->cert_path}");
         }
 
-        $pfxContent = Storage::get($company->cert_path);
-        $password = $company->cert_password;
+        $pfxContent = Storage::get($this->company->cert_path);
+        $password = $this->company->cert_password;
 
         if (!$pfxContent) {
             throw new Exception("Conteúdo do certificado vazio.");
@@ -64,8 +63,6 @@ class SignatureService
         $objDSig->sign($objKey);
         $objDSig->add509Cert($certificate);
         $objDSig->appendSignature($dom->documentElement);
-
-        \Log::info("Conteúdo XML assinado: " . $dom->saveXML());
 
         return $dom->saveXML();
     }

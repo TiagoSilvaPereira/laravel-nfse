@@ -34,6 +34,10 @@ class EmitInvoice
      */
     public function execute(Company $company, array $data): Invoice
     {
+        $this->xmlBuilder->setCompany($company);
+        $this->signatureService->setCompany($company);
+        $this->transmitter->setCompany($company);
+
         $this->validator->validate($data);
 
         $existingInvoice = $this->findExistingInvoice($company, $data['integration_id'] ?? null);
@@ -72,9 +76,9 @@ class EmitInvoice
         $data['nDPS'] = $dpsInfo['number'];
         $data['serie'] = $dpsInfo['series'];
 
-        $xmlContent = $this->xmlBuilder->buildDpsXml($company, $data);
+        $xmlContent = $this->xmlBuilder->buildDpsXml($data);
 
-        $dpsId = $this->xmlBuilder->generateDpsId($company, $dpsInfo['number'], $dpsInfo['series']);
+        $dpsId = $this->xmlBuilder->generateDpsId($dpsInfo['number'], $dpsInfo['series']);
         
         $signedXml = $this->signatureService->sign($xmlContent, $company);
 
@@ -137,7 +141,7 @@ class EmitInvoice
         try {
             $this->xmlValidator->validate($signedXml);
 
-            $response = $this->transmitter->transmit($signedXml, $company);
+            $this->transmitter->transmit($signedXml, $company);
             
             $invoice->update([
                 'status' => NfseStatus::AUTHORIZED,

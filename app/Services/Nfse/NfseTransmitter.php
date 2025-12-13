@@ -3,7 +3,7 @@
 namespace App\Services\Nfse;
 
 use App\Exceptions\NfseApiException;
-use App\Models\Company;
+use App\Services\Nfse\Concerns\HasCompany;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 use Exception;
@@ -11,9 +11,11 @@ use GuzzleHttp\Exception\RequestException;
 
 class NfseTransmitter
 {
-    public function transmit(string $signedXml, Company $company): array
+    use HasCompany;
+
+    public function transmit(string $signedXml): array
     {
-        $baseUrl = $this->calculateBaseUrl($company);
+        $baseUrl = $this->calculateBaseUrl();
         $finalUrl = rtrim($baseUrl, '/') . '/nfse';
 
         $compressedBase64Xml = $this->compressAndEncodeXml($signedXml);
@@ -22,7 +24,7 @@ class NfseTransmitter
             'dpsXmlGZipB64' => $compressedBase64Xml
         ];
 
-        $certPath = $this->getCertificatePemPath($company);
+        $certPath = $this->getCertificatePemPath();
 
         $client = new Client([
             'cert' => $certPath,
@@ -35,6 +37,7 @@ class NfseTransmitter
         ]);
 
         try {
+
             $response = $client->post($finalUrl, [
                 'json' => $payload
             ]);
@@ -44,6 +47,7 @@ class NfseTransmitter
             return $body;
 
         } catch (RequestException $e) {
+
             $responseBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'Sem resposta do servidor';
             
             \Illuminate\Support\Facades\Log::error("Erro no envio da DPS: " . $e->getMessage());
@@ -54,6 +58,7 @@ class NfseTransmitter
             }
 
             throw $e;
+
         } catch (\Exception $e) {
             throw new Exception("Erro na transmissão da NFS-e: " . $e->getMessage());
         } finally {
@@ -69,24 +74,24 @@ class NfseTransmitter
         return base64_encode($gzipped);
     }
 
-    protected function calculateBaseUrl(Company $company): string
+    protected function calculateBaseUrl(): string
     {
         $productionUrl = config('services.nfse.sefin_url');
         $homologationUrl = config('services.nfse.sefin_url_homologation');
 
-        return $company->isProduction()
+        return $this->company->isProduction()
             ? $productionUrl
             : $homologationUrl;
     }
 
-    protected function getCertificatePemPath(Company $company): string
+    protected function getCertificatePemPath(): string
     {
-        if (!Storage::exists($company->cert_path)) {
+        if (!Storage::exists($this->company->cert_path)) {
             throw new Exception("Certificado PFX não encontrado.");
         }
 
-        $pfxContent = Storage::get($company->cert_path);
-        $password = $company->cert_password;
+        $pfxContent = Storage::get($this->company->cert_path);
+        $password = $this->company->cert_password;
 
         $certs = [];
         
@@ -96,7 +101,7 @@ class NfseTransmitter
 
         $pemContent = $certs['cert'] . "\n" . $certs['pkey'];
 
-        $tempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cert_' . $company->id . '_' . uniqid() . '.pem';
+        $tempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cert_' . $this->company->id . '_' . uniqid() . '.pem';
         file_put_contents($tempPath, $pemContent);
 
         return $tempPath;
