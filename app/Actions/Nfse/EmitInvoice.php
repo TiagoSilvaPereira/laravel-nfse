@@ -3,6 +3,7 @@
 namespace App\Actions\Nfse;
 
 use App\Enums\NfseStatus;
+use App\Exceptions\NfseApiException;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Services\Nfse\NfseTransmitter;
@@ -139,9 +140,14 @@ class EmitInvoice
                 'status_message' => 'Autorizada com sucesso',
                 // 'xml_nfse' => ... extrair do retorno
             ]);
+        } catch (NfseApiException $e) {
+            $invoice->update([
+                'status' => NfseStatus::REJECTED,
+                'status_message' => $e->getMessage(),
+            ]);
         } catch (Exception $e) {
             $invoice->update([
-                'status' => NfseStatus::ERROR, // Ou REJECTED dependendo do erro
+                'status' => NfseStatus::ERROR,
                 'status_message' => $e->getMessage(),
             ]);
         }

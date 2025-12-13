@@ -2,16 +2,19 @@
 
 namespace App\Services\Nfse;
 
+use App\Exceptions\NfseApiException;
 use App\Models\Company;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 use Exception;
+use GuzzleHttp\Exception\RequestException;
 
 class NfseTransmitter
 {
     public function transmit(string $signedXml, Company $company): array
     {
         $baseUrl = $this->calculateBaseUrl($company);
+        $finalUrl = rtrim($baseUrl, '/') . '/nfse';
 
         $gzipped = gzencode($signedXml);
         $base64 = base64_encode($gzipped);
@@ -23,7 +26,6 @@ class NfseTransmitter
         $certPath = $this->getCertificatePemPath($company);
 
         $client = new Client([
-            'base_uri' => $baseUrl,
             'cert' => $certPath,
             'headers' => [
                 'Content-Type' => 'application/json',
@@ -31,13 +33,25 @@ class NfseTransmitter
         ]);
 
         try {
-            $response = $client->post('nfse', [
+            $response = $client->post($finalUrl, [
                 'json' => $payload
             ]);
 
             $body = json_decode($response->getBody()->getContents(), true);
+            
             return $body;
 
+        } catch (RequestException $e) {
+            $responseBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'Sem resposta do servidor';
+            
+            \Illuminate\Support\Facades\Log::error("Erro no envio da DPS: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error("Conteúdo da resposta de erro: " . $responseBody);
+
+            if ($e->hasResponse()) {
+                throw new NfseApiException($responseBody, $e->getCode(), $e);
+            }
+
+            throw $e;
         } catch (\Exception $e) {
             throw new Exception("Erro na transmissão da NFS-e: " . $e->getMessage());
         } finally {

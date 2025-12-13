@@ -10,6 +10,8 @@ O número da DPS documenta as tentativas de emissão, e a NFS-e é o documento o
 
 ## Obtenção do certificado digital
 
+## Obtendo dados como URL das webservices, códigos de tributação, etc
+
 ## Corrigindo problemas com certificado com algoritmo legado
 
 Criar também um utilitário para corrigir certificados com algoritmos legados.
