@@ -108,6 +108,10 @@ $dadosNota = [
     }
 }
 ```
+## Comandos disponíveis
+
+php artisan nfse:clear-schemas
+
 
 ## Erros comuns e como resolver
 
