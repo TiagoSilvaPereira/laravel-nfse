@@ -2,6 +2,8 @@
 
 namespace App\Services\Nfse;
 
+use App\Helpers\Tools;
+
 class NfseMapper
 {
     /**
@@ -12,10 +14,12 @@ class NfseMapper
      */
     public function toInternal(array $data): array
     {
+        // Data do Payload amigável
         $customer = $data['customer'];
         $service = $data['service'];
         $address = $customer['address'] ?? null;
 
+        // Mapeamento para estrutura interna da NFS-e
         $tomador = [
             'xNome' => $customer['name'],
             'cpfCnpj' => $customer['cpfCnpj'] ?? null,
@@ -32,8 +36,8 @@ class NfseMapper
                 'cPais' => $address['country_code'] ?? '1058',
                 'CEP' => $address['zip_code'] ?? null,
             ];
-            
-            $tomador['endereco'] = array_filter($tomador['endereco'], fn($v) => !is_null($v));
+
+            $tomador['endereco'] = Tools::removeNullValues($tomador['endereco']);
         }
 
 
@@ -50,8 +54,8 @@ class NfseMapper
 
         return [
             'tomador' => $tomador,
-            'servico' => array_filter($servico, fn($v) => !is_null($v)),
             'valores' => $valores,
+            'servico' => Tools::removeNullValues($servico),
         ];
     }
 }

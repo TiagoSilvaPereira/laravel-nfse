@@ -2,6 +2,7 @@
 
 namespace App\Services\Nfse;
 
+use App\Helpers\Tools;
 use App\Services\Nfse\Concerns\HasCompany;
 use Carbon\Carbon;
 use Spatie\ArrayToXml\ArrayToXml;
@@ -113,13 +114,14 @@ class XmlBuilderService
             $toma['end']['xCpl'] = $end['xCpl'] ?? null;
             $toma['end']['xBairro'] = $end['xBairro'] ?? 'Centro';
             
-            // Remove null values recursively
-            $toma['end'] = array_filter($toma['end'], fn($v) => !is_null($v));
+            $toma['end'] = Tools::removeNullValues($toma['end']);
+            
             if (isset($toma['end']['endNac'])) {
-                $toma['end']['endNac'] = array_filter($toma['end']['endNac'], fn($v) => !is_null($v));
+                $toma['end']['endNac'] = Tools::removeNullValues($toma['end']['endNac']);
             }
+
             if (isset($toma['end']['endExt'])) {
-                $toma['end']['endExt'] = array_filter($toma['end']['endExt'], fn($v) => !is_null($v));
+                $toma['end']['endExt'] = Tools::removeNullValues($toma['end']['endExt']);
             }
         }
 
