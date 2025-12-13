@@ -16,11 +16,10 @@ class NfseTransmitter
         $baseUrl = $this->calculateBaseUrl($company);
         $finalUrl = rtrim($baseUrl, '/') . '/nfse';
 
-        $gzipped = gzencode($signedXml);
-        $base64 = base64_encode($gzipped);
+        $compressedBase64Xml = $this->compressAndEncodeXml($signedXml);
 
         $payload = [
-            'nfseXmlGZipB64' => $base64
+            'dpsXmlGZipB64' => $compressedBase64Xml
         ];
 
         $certPath = $this->getCertificatePemPath($company);
@@ -29,6 +28,9 @@ class NfseTransmitter
             'cert' => $certPath,
             'headers' => [
                 'Content-Type' => 'application/json',
+            ],
+            'curl' => [
+                CURLOPT_SSLVERSION => 6, // TLS 1.2
             ],
         ]);
 
@@ -61,6 +63,12 @@ class NfseTransmitter
         }
     }
 
+    protected function compressAndEncodeXml(string $xml): string
+    {
+        $gzipped = gzencode($xml);
+        return base64_encode($gzipped);
+    }
+
     protected function calculateBaseUrl(Company $company): string
     {
         $productionUrl = config('services.nfse.sefin_url');
@@ -81,6 +89,7 @@ class NfseTransmitter
         $password = $company->cert_password;
 
         $certs = [];
+        
         if (!openssl_pkcs12_read($pfxContent, $certs, $password)) {
             throw new Exception("Falha ao ler PFX para conversão.");
         }
