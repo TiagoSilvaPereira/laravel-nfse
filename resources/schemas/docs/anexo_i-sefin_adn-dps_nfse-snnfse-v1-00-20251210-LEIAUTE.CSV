@@ -58,7 +58,7 @@ Notas emitidas pela Sistema Nacional NFS-e sempre tem tpEmis = 1.
 ";;;;;;
 16;NFSe/infNFSe/;procEmi;E;N;0-1;1;"Processo de Emissão da DPS:
 
-1 - Emissão com aplicativo do contribuinte (via Web Service);
+1 - Emissão com aplicativo do contribuinte (via API);
 2 - Emissão com aplicativo disponibilizado pelo fisco (Web);
 3 - Emissão com aplicativo disponibilizado pelo fisco (App);";"Esta informação deve ser preenchida somente em NFS-e emitidas pelo Sistema Nacional NFS-e.
 
@@ -66,7 +66,6 @@ Municipios com emissores próprios não podem informar este campo na transcrição d
 17;NFSe/infNFSe/;cStat;E;N;1-1;3;"Código de Situações da NFS-e:
 
 100 - NFS-e Gerada;
-101 - NFS-e de Substituição Gerada;
 102 - NFS-e de Decisão Judicial ou Administrativa;
 103 - NFS-e Avulsa;
 107 - NFS-e MEI;";-;;;;;;
@@ -169,7 +168,11 @@ Somar os valores de Pis/Cofins a vTotalRet conforme os possíveis valores para o 
 VLiq = vServ – vDescIncond – vDescCond – (vRetCP + vRetIRRF + vRetCSLL)* – ( vISSQN - vPIS + vCOFINS)**";"*Para o resultado do Valor Líquido o CP, IRRF e CSLL serão sempre subtraídos, se constarem na DPS, pois sempre são retidos.
 
 **Para o resultado do Valor Líquido o ISSQN, PIS e COFINS somente serão subtraídos quando forem retidos.";;;;;;
-45;NFSe/infNFSe/;xOutInf;E;C;0-1;;;-;;;;;;
+45;NFSe/infNFSe/;xOutInf;E;C;0-1;2000;Uso da Administração Tributária Municipal.;"O Sistema Nacional NFS-e deverá incluir estas mensagens quando:
+
+1) ocorrer os cenários 28 e 34, conforme a planilha ""COMEX - EXPORTAÇÃO DE SERVIÇO"" do AnexoI-LeiautesRN_DPS_NFSe-SNNFSe.
+
+""Por não se tratar de um caso de Exportação de serviço ou Imunidade tributária, então, para este cenário em que foi informado que o tomador do serviço está no exterior e o serviço prestado é devido no local do estabelecimento do tomador, o sujeito passivo será o prestador do serviço e o local de incidência do ISSQN será o local da prestação do serviço, conforme os parágrafos 1º e 2º do Art. 127 do CTN.""";;;;;;
 46;NFSe/infNFSe/;DPS;G;-;1-1;-;Grupo de informações da DPS relativas ao serviço prestado;-;;;;;;
 47;NFSe/infNFSe/DPS/;versao;A;C;1-1;1-4V2;Versão do leiaute da DPS.;-;;;;;;
 48;NFSe/infNFSe/DPS/;infDPS;G;-;1-1;-;"Grupo de Informações da
@@ -207,13 +210,13 @@ Ano, Mês e Dia (AAAA-MM-DD)";A data de competência deve ser única e ser a mesma 
 1 - Prestador;
 2 - Tomador;
 3 - Intermediário;";-;;;;;;
-57;DPS/infDPS/;cMotivoEmisTI;E;N;0-1;1;"Motivo da Emissão da DPS pelo Tomador/Intermediário:
+57;NFSe/infNFSe/DPS/infDPS/;cMotivoEmisTI;E;N;0-1;1;"Motivo da Emissão da DPS pelo Tomador/Intermediário:
 
 1 - Importação de Serviço;
 2 - Tomador/Intermediário obrigado a emitir NFS-e por legislação municipal;
 3 - Tomador/Intermediário emitindo NFS-e por recusa de emissão pelo prestador;
 4 - Tomador/Intermediário emitindo por rejeitar a NFS-e emitida pelo prestador;";Se o município de incidência não for o do tomador, o sistema deve rejeitar eventuais retenções.;;;;;;
-58;DPS/infDPS/;chNFSeRej;E;N;0-1;50;Chave de Acesso da NFS-e rejeitada pelo Tomador/Intermediário.;O tomador deve referenciar neste campo a nota do prestador, utilizando-se da chave da NFS-e emitida pelo prestador e previamente rejeitada pelo tomador, ou seja, o Tomador/Intermediário antes de emitir sua NFS-e pelo motivo 4 do campo cMotivoEmisTI deverá emitir um Evento de Manifestação de NFS-e de rejeição para a NFS-e emitida pelo prestador, cuja chave de acesso será informada neste campo chNFSeRej.;;;;;;
+58;NFSe/infNFSe/DPS/infDPS/;chNFSeRej;E;N;0-1;50;Chave de Acesso da NFS-e rejeitada pelo Tomador/Intermediário.;O tomador deve referenciar neste campo a nota do prestador, utilizando-se da chave da NFS-e emitida pelo prestador e previamente rejeitada pelo tomador, ou seja, o Tomador/Intermediário antes de emitir sua NFS-e pelo motivo 4 do campo cMotivoEmisTI deverá emitir um Evento de Manifestação de NFS-e de rejeição para a NFS-e emitida pelo prestador, cuja chave de acesso será informada neste campo chNFSeRej.;;;;;;
 59;NFSe/infNFSe/DPS/infDPS/;cLocEmi;E;N;1-1;7;Código de 7 dígitos da localidade emissora da NFS-e.;"O campo cLocEmi (Código da Localidade de Emissão da DPS) sempre corresponderá a um município brasileiro e identificado pela tabela de códigos de municípios do IBGE ou um trecho de concessão de exploração de rodovia para a qual a NFS-e foi emiitida.
 
 O município emissor da NFS-e é aquele município em que o emitente da DPS está cadastrado e autorizado a ""emitir uma NFS-e"", ou seja, emitir uma DPS para que o sistema nacional valide as informações nela prestadas e gere a NFS-e correspondente para o emitente.
@@ -240,7 +243,7 @@ Um evento de bloqueio de ofício para qualquer outro tipo de evento é considerado
 65;NFSe/infNFSe/DPS/infDPS/prest/;CNPJ;CE;N;1-1;14;Número da inscrição federal (CNPJ) do prestador do serviço.;-;;;;;;
 66;NFSe/infNFSe/DPS/infDPS/prest/;CPF;CE;N;1-1;11;Número da inscrição federal (CPF) do prestador do serviço.;-;;;;;;
 67;NFSe/infNFSe/DPS/infDPS/prest/;NIF;CE;C;1-1;40;Número de identificação fiscal fornecido por órgão de administração tributária no exterior.;-;;;;;;
-68;DPS/infDPS/prest/;cNaoNIF;CE;N;1-1;1;"Motivo para não informação do NIF:
+68;NFSe/infNFSe/DPS/infDPS/prest/;cNaoNIF;CE;N;1-1;1;"Motivo para não informação do NIF:
 
 0 - Não informado na nota de origem;
 1 - Dispensado do NIF;
@@ -268,13 +271,13 @@ Um evento de bloqueio de ofício para qualquer outro tipo de evento é considerado
 (Preencher com o Código DDD + número do telefone. 
 Nas operações com exterior é permitido informar o código do país + código da localidade + número do telefone)";-;;;;;;
 86;NFSe/infNFSe/DPS/infDPS/prest/;email;E;C;0-1;1-80;E-mail do prestador.;-;;;;;;
-87;DPS/infDPS/prest/;regTrib;G;-;1-1;-;Grupo de informações relativas aos regimes de tributação do prestador de serviços;-;;;;;;
-88;DPS/infDPS/prest/regTrib/;opSimpNac;E;N;1-1;1;"        Situação perante Simples Nacional:
+87;NFSe/infNFSe/DPS/infDPS/prest/;regTrib;G;-;1-1;-;Grupo de informações relativas aos regimes de tributação do prestador de serviços;-;;;;;;
+88;NFSe/infNFSe/DPS/infDPS/prest/regTrib/;opSimpNac;E;N;1-1;1;"        Situação perante Simples Nacional:
 
 1 - Não Optante;
    2 - Optante - Microempreendedor Individual (MEI);
    3 - Optante - Microempresa ou Empresa de Pequeno Porte (ME/EPP);";-;;;;;;
-89;DPS/infDPS/prest/regTrib/;regApTribSN;E;N;0-1;1;"Regime de Apuração Tributária pelo Simples Nacional.
+89;NFSe/infNFSe/DPS/infDPS/prest/regTrib/;regApTribSN;E;N;0-1;1;"Regime de Apuração Tributária pelo Simples Nacional.
 
 Opção para que o contribuinte optante pelo Simples Nacional ME/EPP (opSimpNac = 3) possa indicar, ao emitir o documento fiscal, em qual regime de apuração os tributos federais e municipal estão inseridos, caso tenha ultrapassado algum sublimite ou limite definido para o Simples Nacional.
  
@@ -283,7 +286,7 @@ Opção para que o contribuinte optante pelo Simples Nacional ME/EPP (opSimpNac = 
 3 – Regime de apuração dos tributos federais e municipal pela NFS-e conforme respectivas legilações federal e municipal de cada tributo;";"1 - Um MEI, identificado como tal na data de competência informada na DPS após a verificação na base de dados do Simples Nacional, será tratado sempre como MEI no Sistema Nacional NFS-e, independentemente de quaisquer circustâncias que o próprio MEI tenha detectado que o descaracterize como MEI. A informação da situação do MEI sempre será aquela que for verificada no Simples Nacional na data de competência informada na DPS.
 
 2 - Uma ME/EPP deixará de apurar o ISSQN pelo Simples Nacional quando atribuir ao campo regAPTribSN os valores 2 ou 3, conforme leiaute DPS.";;;;;;
-90;DPS/infDPS/prest/regTrib/;regEspTrib;E;N;1-1;1;"        Tipos de Regimes Especiais de Tributação Municipal:
+90;NFSe/infNFSe/DPS/infDPS/prest/regTrib/;regEspTrib;E;N;1-1;1;"        Tipos de Regimes Especiais de Tributação Municipal:
 
 0 - Nenhum;
 1 - Ato Cooperado (Cooperativa);
@@ -291,8 +294,7 @@ Opção para que o contribuinte optante pelo Simples Nacional ME/EPP (opSimpNac = 
 3 - Microempresa Municipal;
 4 - Notário ou Registrador;
 5 - Profissional Autônomo;
-6 - Sociedade de Profissionais;
-7 - Específicos Municipais;";-;;;;;;
+6 - Sociedade de Profissionais;";-;;;;;;
 91;NFSe/infNFSe/DPS/infDPS/;toma;G;-;0-1;-;Grupo de informações relativas ao tomador do serviço;-;;;;;;
 92;NFSe/infNFSe/DPS/infDPS/toma/;CNPJ;CE;N;1-1;14;Número da inscrição federal (CNPJ) do tomador de serviço.;-;;;;;;
 93;NFSe/infNFSe/DPS/infDPS/toma/;CPF;CE;N;1-1;11;Número da inscrição federal (CPF) do tomador do serviço.;-;;;;;;
@@ -375,7 +377,7 @@ cLocPrestacao poderá assumir: qualquer código que represente um município da tab
 143;NFSe/infNFSe/DPS/infDPS/serv/cServ/;cTribMun;E;N;0-1;3;Código de tributação municipal do ISSQN.;-;;;;;;
 144;NFSe/infNFSe/DPS/infDPS/serv/cServ/;xDescServ;E;C;1-1;1000;Descrição completa do serviço prestado;-;;;;;;
 145;NFSe/infNFSe/DPS/infDPS/serv/cServ/;cNBS;E;N;0-1;9;Código NBS correspondente ao serviço prestado;NBS - Nomenclatura Brasileira de Serviços, Intangíveis e outras Operações que produzam Variações no Patrimônio;;;;;;
-146;DPS/infDPS/serv/cServ/;cIntContrib;E;C;0-1;20;Código interno do contribuinte;Utilizado para identificação da DPS no Sistema interno do Contribuinte;;;;;;
+146;NFSe/infNFSe/DPS/infDPS/serv/cServ/;cIntContrib;E;C;0-1;20;Código interno do contribuinte;Utilizado para identificação da DPS no Sistema interno do Contribuinte;;;;;;
 147;NFSe/infNFSe/DPS/infDPS/serv/;comExt;G;-;0-1;-;Grupo de informações sobre transações entre residentes ou domiciliados no Brasil com residentes ou domiciliados no exterior;-;;;;;;
 148;NFSe/infNFSe/DPS/infDPS/serv/comExt/;mdPrestacao;E;N;1-1;1;"         Modo de Prestação:
 
@@ -474,7 +476,7 @@ Cadastro Nacional de Obras (CNO) ou Cadastro Específico do INSS (CEI).";-;;;;;;
 Ano, Mês e Dia (AAAA-MM-DD)";-;;;;;;
 174;NFSe/infNFSe/DPS/infDPS/serv/atvEvento/;dtFim;E;D;1-1;-;"Data de fim da atividade de evento.
 Ano, Mês e Dia (AAAA-MM-DD)";-;;;;;;
-175;NFSe/infNFSe/DPS/infDPS/serv/atvEvento/;idAtvEv;CE;C;1-1;1-30;"Identificação da Atividade de Evento 
+175;NFSe/infNFSe/DPS/infDPS/serv/atvEvento/;idAtvEvt;CE;C;1-1;1-30;"Identificação da Atividade de Evento 
 (código identificador de evento determinado pela Administração Tributária Municipal)";Choice com o grupo de endereço da atividade de evento;;;;;;
 176;NFSe/infNFSe/DPS/infDPS/serv/atvEvento/;end;CG;-;1-1;-;Grupo de informações do endereço da atividade de evento.;;;;;;;
 177;NFSe/infNFSe/DPS/infDPS/serv/atvEvento/end/;CEP;CE;C;1-1;8;Código de Endereçamento Postal numérico do endereço nacional da atividade de evento.;;;;;;;
@@ -489,7 +491,7 @@ Ano, Mês e Dia (AAAA-MM-DD)";-;;;;;;
 186;NFSe/infNFSe/DPS/infDPS/serv;infoCompl;G;-;0-1;-;Grupo de informações complementares disponível para todos os serviços prestados;Campos possíveis de preenchimento na DPS para todos os subitens da lista de serviços que forem prestados;;;;;;
 187;NFSe/infNFSe/DPS/infDPS/serv/infoCompl/;idDocTec;E;C;0-1;1-40;"Identificador de Documento de Responsabilidade Técnica:
 ART, RRT, DRT, Outros.";;;;;;;
-188;NFSe/infNFSe/DPS/infDPS/serv/infoCompl/;docRef;E;C;0-1;255;Chave da nota, número identificador da nota, número do contrato ou outro identificador de documento emitido pelo prestador de serviços, que subsidia a emissão dessa nota pelo tomador do serviço ou intermediário (preenchimento obrigatório caso a nota esteja sendo emitida pelo Tomador ou intermediário do serviço).;;;;;;;
+188;NFSe/infNFSe/DPS/infDPS/serv/infoCompl/;docRef;E;C;0-1;1-255;Chave da nota, número identificador da nota, número do contrato ou outro identificador de documento emitido pelo prestador de serviços, que subsidia a emissão dessa nota pelo tomador do serviço ou intermediário (preenchimento obrigatório caso a nota esteja sendo emitida pelo Tomador ou intermediário do serviço).;;;;;;;
 189;NFSe/infNFSe/DPS/infDPS/serv/infoCompl/;xInfComp;E;C;0-1;2000;Campo livre para preenchimento pelo contribuinte.;;;;;;;
 190;NFSe/infNFSe/DPS/infDPS/;valores;G;-;1-1;-;Grupo de informações relativas à valores do serviço prestado;-;;;;;;
 191;NFSe/infNFSe/DPS/infDPS/valores/;vServPrest;G;-;1-1;-;Grupo de informações relativas aos valores do serviço prestado;-;;;;;;
@@ -529,7 +531,7 @@ Outros documentos;";;;;;;
 
 01 – Alimentação e bebidas/frigobar; 
 02 – Materiais;
- 0 3 – Produção externa;
+ 03 – Produção externa;
  04 – Reembolso de despesas;
   05 – Repasse consorciado;
   06 – Repasse plano de saúde;
@@ -668,22 +670,22 @@ Se o município de incidência não pertence ao Sistema Nacional NFS-e a alíquota n
 266;NFSe/infNFSe/DPS/infDPS/valores/trib/tribFed/;vRetIRRF;E;N;0-1;1-15V2;Valor monetário do IRRF (R$).;-;;;;;;
 267;NFSe/infNFSe/DPS/infDPS/valores/trib/tribFed/;vRetCSLL;E;N;0-1;1-15V2;Valor monetário do CSLL (R$).;-;;;;;;
 268;NFSe/infNFSe/DPS/infDPS/valores/trib/;totTrib;G;-;1-1;-;Grupo de informações para totais aproximados dos tributos relacionados ao serviço prestado;;;;;;;
-269;NFSe/infNFSe/DPS/infDPS/valores/trib/totTrib/;vTotTrib;CG;-;0-1;-;"Valor monetário total aproximado dos tributos,
+269;NFSe/infNFSe/DPS/infDPS/valores/trib/totTrib/;vTotTrib;CG;-;1-1;-;"Valor monetário total aproximado dos tributos,
 em conformidade com o artigo 1o da Lei no 12.741/2012";;;;;;;
 270;NFSe/infNFSe/DPS/infDPS/valores/trib/totTrib/vTotTrib/;vTotTribFed;E;N;1-1;1-15V2;Valor monetário total aproximado dos tributos federais (R$).;;;;;;;
 271;NFSe/infNFSe/DPS/infDPS/valores/trib/totTrib/vTotTrib/;vTotTribEst;E;N;1-1;1-15V2;Valor monetário total aproximado dos tributos estaduais (R$).;;;;;;;
 272;NFSe/infNFSe/DPS/infDPS/valores/trib/totTrib/vTotTrib/;vTotTribMun;E;N;1-1;1-15V2;Valor monetário total aproximado dos tributos municipais (R$).;;;;;;;
-273;NFSe/infNFSe/DPS/infDPS/valorestrib/totTrib/;pTotTrib;CG;-;0-1;-;"Valor percentual total aproximado dos tributos,
+273;NFSe/infNFSe/DPS/infDPS/valorestrib/totTrib/;pTotTrib;CG;-;1-1;-;"Valor percentual total aproximado dos tributos,
 em conformidade com o artigo 1o da Lei no 12.741/2012";;;;;;;
 274;NFSe/infNFSe/DPS/infDPS/valores/trib/totTrib/pTotTrib/;pTotTribFed;E;N;1-1;1-2V2;Valor percentual total aproximado dos tributos federais (%).;;;;;;;
 275;NFSe/infNFSe/DPS/infDPS/valores/trib/totTrib/pTotTrib/;pTotTribEst;E;N;1-1;1-2V2;Valor percentual total aproximado dos tributos estaduais (%).;;;;;;;
 276;NFSe/infNFSe/DPS/infDPS/valores/trib/totTrib/pTotTrib/;pTotTribMun;E;N;1-1;1-2V2;Valor percentual total aproximado dos tributos municipais (%).;;;;;;;
-277;NFSe/infNFSe/DPS/infDPS/valores/trib/totTrib/;indTotTrib;CE;N;0-1;1;"Indicador de informação de valor total de tributos.
+277;NFSe/infNFSe/DPS/infDPS/valores/trib/totTrib/;indTotTrib;CE;N;1-1;1;"Indicador de informação de valor total de tributos.
 Se informado indica que o emitente opta por não informar nenhum valor estimado para os Tributos
 (Decreto 8.264/2014).
 
 0 - Não;";;;;;;;
-278;NFSe/infNFSe/DPS/infDPS/valores/trib/totTrib/;pTotTribSN;CE;N;0-1;1-2V2;Valor percentual aproximado do total dos tributos da alíquota do Simples Nacional (%).;;;;;;;
+278;NFSe/infNFSe/DPS/infDPS/valores/trib/totTrib/;pTotTribSN;CE;N;1-1;1-2V2;Valor percentual aproximado do total dos tributos da alíquota do Simples Nacional (%).;;;;;;;
 279;NFSe/infNFSe/DPS/infDPS/;Signature;G;-;0-1;-;"Assinatura XML da NFS-e Segundo o Padrão XML Digital Signature
 Obrigatório quando for enviado para API.
 Demais casos poderão ser opcionais a serem definidos em regra de validação.";-;;;;;;

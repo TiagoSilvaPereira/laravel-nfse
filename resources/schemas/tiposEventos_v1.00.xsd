@@ -21,7 +21,7 @@
   <!--TIPO COMPLEXO PARA INFORMAÇÕES DO EVENTO-->
   <xs:complexType name="TCInfEvento">
     <xs:sequence>
-      <xs:element name="verAplic" type="TSVerAplic" minOccurs="0">
+      <xs:element name="verAplic" type="TSVerAplic">
         <xs:annotation>
           <xs:documentation>Versão do aplicativo que gerou o pedido do evento.</xs:documentation>
         </xs:annotation>

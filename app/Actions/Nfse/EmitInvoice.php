@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\Invoice;
 use App\Services\Nfse\NfseTransmitter;
 use App\Services\Nfse\NfseValidator;
+use App\Services\Nfse\XmlValidatorService;
 use App\Services\Nfse\SignatureService;
 use App\Services\Nfse\XmlBuilderService;
 use Exception;
@@ -17,6 +18,7 @@ class EmitInvoice
 {
     public function __construct(
         protected NfseValidator $validator,
+        protected XmlValidatorService $xmlValidator,
         protected XmlBuilderService $xmlBuilder,
         protected SignatureService $signatureService,
         protected NfseTransmitter $transmitter
@@ -133,6 +135,8 @@ class EmitInvoice
     protected function transmitAndUpdateStatus(Invoice $invoice, Company $company, string $signedXml): void
     {
         try {
+            $this->xmlValidator->validate($signedXml);
+
             $response = $this->transmitter->transmit($signedXml, $company);
             
             $invoice->update([

@@ -153,11 +153,11 @@
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="TSSerieDPS">
-    <xs:restriction base="xs:string">
-      <xs:maxLength value="5"/>
-      <xs:minLength value="1"/>
-      <xs:whiteSpace value="preserve"/>
-    </xs:restriction>
+	<xs:restriction base="xs:string">
+		<xs:maxLength value="5"/>
+		<xs:pattern value="[0-9]{1,5}"/>
+		<xs:whiteSpace value="preserve"/>
+	</xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="TSEmitenteDPS">
     <xs:annotation>

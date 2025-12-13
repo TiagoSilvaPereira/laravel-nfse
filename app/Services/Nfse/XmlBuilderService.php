@@ -12,7 +12,8 @@ class XmlBuilderService
     {
         $dpsNumber = $data['nDPS'];
         $dpsSeries = $data['serie'];
-        $issueDate = Carbon::now()->setTimezone('America/Sao_Paulo')->  format('Y-m-d\TH:i:sP');
+        
+        $issueDate = Carbon::now()->setTimezone('America/Sao_Paulo')->format('Y-m-d\TH:i:sP');
 
         $infDpsId = $this->generateDpsId($company, $dpsNumber, $dpsSeries);
 
@@ -26,7 +27,12 @@ class XmlBuilderService
                 'verAplic' => 'LaravelNFSe_v1.0',
                 'dCompet' => Carbon::now()->format('Y-m-d'),
                 'prest' => [
-                    'CNPJ' => $company->cnpj,
+                    'CNPJ' => preg_replace('/\D/', '', $company->cnpj),
+                    'regTrib' => [
+                        'opSimpNac' => 3, // 3 - Optante - Microempresa ou Empresa de Pequeno Porte (ME/EPP)
+                        'regApTribSN' => 1,
+                        'regEspTrib' => 0,
+                    ]
                 ],
                 'toma' => $this->buildCustomer($data['tomador']),
                 'serv' => $this->buildService($data),
@@ -50,7 +56,8 @@ class XmlBuilderService
         // ID = "DPS" + CMun(7) + TipoInscr(1) + CNPJ(14) + Serie(5) + Numero(15)
         $tipoInscr = '2'; // CNPJ
         $cMun = $company->municipality_code;
-        $cnpj = $company->cnpj;
+        $cnpj = preg_replace('/\D/', '', $company->cnpj);
+        $cnpj = str_pad($cnpj, 14, '0', STR_PAD_LEFT);
         $serie = str_pad($dpsSeries, 5, '0', STR_PAD_LEFT);
         $nDps = str_pad($dpsNumber, 15, '0', STR_PAD_LEFT);
 
@@ -95,7 +102,9 @@ class XmlBuilderService
     protected function buildService(array $data): array
     {
         $serv = [
-            'cLocPrestacao' => $data['servico']['cLocPrestacao'] ?? null, // Onde o serviço foi prestado
+            'locPrest' => [
+                'cLocPrestacao' => $data['servico']['cLocPrestacao'] ?? null,
+            ],
             'cServ' => [
                 'cTribNac' => $data['servico']['cTribNac'], // Código de Tributação Nacional
                 'xDescServ' => $data['servico']['xDescServ'],
@@ -108,12 +117,17 @@ class XmlBuilderService
     protected function buildValues(array $values): array
     {
         return [
-            'vServ' => number_format($values['vServ'], 2, '.', ''),
-            'tributos' => [
-                'trib' => [
-                    'pAliq' => number_format($values['pAliq'] ?? 0, 2, '.', ''),
-                    'tpRet' => 1, // 1 - Sem retenção (exemplo simplificado)
-                ]
+            'vServPrest' => [
+                'vServ' => number_format($values['vServ'], 2, '.', ''),
+            ],
+            'trib' => [
+                'tribMun' => [
+                    'tribISSQN' => 1, // Operação tributável
+                    'tpRetISSQN' => 1, // 1 - Não Retido
+                ],
+                'totTrib' => [
+                    'pTotTribSN' => '0.00',
+                ],
             ]
         ];
     }

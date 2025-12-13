@@ -121,3 +121,18 @@ Verifique se o XML está formatado corretamente e utilizando UTF-8. Além disso,
 
 ### [E6155] Xml declarado com prefixo de namespace.
 
+Provavelmente o XML está sendo gerado com o prefixo "ds:" após a assinatura. Resolva passando um prefixo vazio para na classe XMLSecurityDSig, como no exemplo abaixo:
+
+```php
+new XMLSecurityDSig('')
+```
+
+### [E6154] Xml não está utilizando codificação UTF-8.
+
+Verifique se o XML está sendo gerado com a codificação UTF-8 e com o header correto:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+```
+
+
