@@ -14,13 +14,16 @@ class NfseMapper
     {
         $customer = $data['customer'];
         $service = $data['service'];
-        $address = $customer['address'] ?? [];
+        $address = $customer['address'] ?? null;
 
         $tomador = [
             'xNome' => $customer['name'],
             'cpfCnpj' => $customer['cpfCnpj'] ?? null,
             'nif' => $customer['nif'] ?? null,
-            'endereco' => [
+        ];
+
+        if(isset($address)) {
+            $tomador['endereco'] = [
                 'xLgr' => $address['street'] ?? null,
                 'nro' => $address['number'] ?? null,
                 'xCpl' => $address['complement'] ?? null,
@@ -28,10 +31,11 @@ class NfseMapper
                 'cMun' => $address['city_code'] ?? null,
                 'cPais' => $address['country_code'] ?? '1058',
                 'CEP' => $address['zip_code'] ?? null,
-            ],
-        ];
+            ];
+            
+            $tomador['endereco'] = array_filter($tomador['endereco'], fn($v) => !is_null($v));
+        }
 
-        $tomador['endereco'] = array_filter($tomador['endereco'], fn($v) => !is_null($v));
 
         $servico = [
             'cTribNac' => $service['code'],

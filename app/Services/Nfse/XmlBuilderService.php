@@ -90,17 +90,37 @@ class XmlBuilderService
 
         if (isset($customerData['endereco'])) {
             $end = $customerData['endereco'];
-            $toma['end'] = [
-                'xLgr' => $end['xLgr'] ?? 'Rua Desconhecida',
-                'nro' => $end['nro'] ?? 'S/N',
-                'xCpl' => $end['xCpl'] ?? null,
-                'xBairro' => $end['xBairro'] ?? 'Centro',
-                'cMun' => $end['cMun'] ?? null, // Obrigatório se Brasil
-                'cPais' => $end['cPais'] ?? '1058', // Default Brasil
-                'CEP' => $end['CEP'] ?? null,
-            ];
+            $cPais = $end['cPais'] ?? '1058'; // Default Brasil
+
+            $toma['end'] = [];
+
+            if ($cPais === '1058') {
+                $toma['end']['endNac'] = [
+                    'cMun' => $end['cMun'] ?? null,
+                    'CEP' => $end['CEP'] ?? null,
+                ];
+            } else {
+                $toma['end']['endExt'] = [
+                    'cPais' => $cPais,
+                    'cEndPost' => $end['cEndPost'] ?? '00000000', // Ajustar conforme necessidade
+                    'xCidade' => $end['xCidade'] ?? 'Cidade Exterior',
+                    'xEstProvReg' => $end['xEstProvReg'] ?? 'Estado Exterior',
+                ];
+            }
+
+            $toma['end']['xLgr'] = $end['xLgr'] ?? 'Rua Desconhecida';
+            $toma['end']['nro'] = $end['nro'] ?? 'S/N';
+            $toma['end']['xCpl'] = $end['xCpl'] ?? null;
+            $toma['end']['xBairro'] = $end['xBairro'] ?? 'Centro';
             
+            // Remove null values recursively
             $toma['end'] = array_filter($toma['end'], fn($v) => !is_null($v));
+            if (isset($toma['end']['endNac'])) {
+                $toma['end']['endNac'] = array_filter($toma['end']['endNac'], fn($v) => !is_null($v));
+            }
+            if (isset($toma['end']['endExt'])) {
+                $toma['end']['endExt'] = array_filter($toma['end']['endExt'], fn($v) => !is_null($v));
+            }
         }
 
         return $toma;
@@ -113,7 +133,7 @@ class XmlBuilderService
                 'cLocPrestacao' => $this->company->municipality_code,
             ],
             'cServ' => [
-                'cTribNac' => $data['servico']['cTribNac'], // Código de Tributação Nacional
+                'cTribNac' => preg_replace('/\D/', '', $data['servico']['cTribNac']), // Código de Tributação Nacional (apenas números)
                 'xDescServ' => $data['servico']['xDescServ'],
             ],
         ];
