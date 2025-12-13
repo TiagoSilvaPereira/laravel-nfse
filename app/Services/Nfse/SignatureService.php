@@ -21,6 +21,8 @@ class SignatureService
      */
     public function sign(string $xmlContent, Company $company): string
     {
+        \Log::info("Conteúdo XML antes da assinatura: " . $xmlContent);
+
         if (!Storage::exists($company->cert_path)) {
             throw new Exception("Certificado não encontrado em: {$company->cert_path}");
         }
@@ -42,9 +44,11 @@ class SignatureService
         $privateKey = $certs['pkey'];
 
         $dom = new DOMDocument();
-        $dom->loadXML($xmlContent);
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = false;
+        $dom->loadXML($xmlContent, LIBXML_NOBLANKS);
 
-        $objDSig = new XMLSecurityDSig();
+        $objDSig = new XMLSecurityDSig('');
         $objDSig->setCanonicalMethod(XMLSecurityDSig::EXC_C14N);
         
         $objDSig->addReference(
@@ -60,6 +64,8 @@ class SignatureService
         $objDSig->sign($objKey);
         $objDSig->add509Cert($certificate);
         $objDSig->appendSignature($dom->documentElement);
+
+        \Log::info("Conteúdo XML assinado: " . $dom->saveXML());
 
         return $dom->saveXML();
     }
