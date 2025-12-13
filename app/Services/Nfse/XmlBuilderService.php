@@ -12,13 +12,15 @@ class XmlBuilderService
     {
         $dpsNumber = $data['nDPS'];
         $dpsSeries = $data['serie'];
-        $issueDate = Carbon::now()->format('Y-m-d\TH:i:s');
+        $issueDate = Carbon::now()->setTimezone('America/Sao_Paulo')->  format('Y-m-d\TH:i:sP');
 
         $infDpsId = $this->generateDpsId($company, $dpsNumber, $dpsSeries);
 
         $dpsArray = [
             'infDPS' => [
-                '_attributes' => ['Id' => $infDpsId, 'versao' => '1.00'],
+                '_attributes' => [
+                    'Id' => $infDpsId,
+                ],
                 'tpAmb' => $company->environment->value,
                 'dhEmi' => $issueDate,
                 'verAplic' => 'LaravelNFSe_v1.0',
@@ -32,16 +34,15 @@ class XmlBuilderService
             ]
         ];
 
-        $arrayToXml = new ArrayToXml($dpsArray, [
+        $xml = ArrayToXml::convert($dpsArray, [
             'rootElementName' => 'DPS',
             '_attributes' => [
+                'versao' => '1.00',
                 'xmlns' => 'http://www.sped.fazenda.gov.br/nfse',
-                'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-                'xsi:schemaLocation' => 'http://www.sped.fazenda.gov.br/nfse DPS_v1.00.xsd'
             ],
-        ]);
+        ], true, 'UTF-8');
 
-        return $arrayToXml->toXml();
+        return $xml;
     }
 
     public function generateDpsId(Company $company, int $dpsNumber, string $dpsSeries): string

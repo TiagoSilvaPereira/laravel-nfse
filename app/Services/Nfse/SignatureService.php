@@ -38,26 +38,27 @@ class SignatureService
             throw new Exception("Falha ao ler o arquivo PKCS#12. Verifique a senha.");
         }
 
+        $certificate = $certs['cert'];
+        $privateKey = $certs['pkey'];
+
         $dom = new DOMDocument();
         $dom->loadXML($xmlContent);
 
         $objDSig = new XMLSecurityDSig();
-        $objDSig->setCanonicalMethod(XMLSecurityDSig::C14N);
+        $objDSig->setCanonicalMethod(XMLSecurityDSig::EXC_C14N);
         
         $objDSig->addReference(
             $dom,
-            XMLSecurityDSig::SHA1,
-            ['http://www.w3.org/2000/09/xmldsig#enveloped-signature', 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315'],
+            XMLSecurityDSig::SHA256,
+            ['http://www.w3.org/2000/09/xmldsig#enveloped-signature'],
             ['force_uri' => true]
         );
 
-        $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, ['type' => 'private']);
-        $objKey->loadKey($certs['pkey']);
+        $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, ['type' => 'private']);
+        $objKey->loadKey($privateKey);
 
         $objDSig->sign($objKey);
-
-        $objDSig->add509Cert($certs['cert']);
-
+        $objDSig->add509Cert($certificate);
         $objDSig->appendSignature($dom->documentElement);
 
         return $dom->saveXML();

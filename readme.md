@@ -2,6 +2,9 @@
 
 ## Introdução
 
+## Timezone do sistema
+O sistema deve estar configurado para o timezone "America/Sao_Paulo" (UTC-3)?
+
 ## Ciclo de vida da NFS-e (DPS, NFS-e, eventos, etc)
 
 Detalhes sobre a DPS (Documento Provisório de Serviço), que é o documento inicial, e depois a NFS-e que é o documento final.
@@ -38,6 +41,8 @@ protected $casts = [
 ## Criar o serviço de assinatura do XML
 
 ## Criar o serviço que monta o XML da DPS
+
+Garantir que o XML seja gerado com encoding UTF-8 e assinado corretamente, além de comprimido e codificado em base64.
 
 ## Utilitário para corrigir certificado
 
@@ -103,3 +108,16 @@ $dadosNota = [
     }
 }
 ```
+
+## Erros comuns e como resolver
+
+### [RNG9999] Erro não catalogado
+
+Verifique se está enviando a propriedade correta no payload. Por exemplo, se o serviço espera `dpsXmlGZipB64` e você está enviando `nfseXmlGZipB64`, ocorrerá esse erro.
+
+### [RNG6110] Falha Schema Xml (Xml mal formado. System.NullReferenceException: Object reference not set to an instance of an object.\r\n   at Serpro.Sped.NFSe.Schemas.Controle.ControleValidarSchema.Validar(String xml, TipoDocumentoRequisicao tipoDocReq, ResultadoProcessamento resultado))
+
+Verifique se o XML está formatado corretamente e utilizando UTF-8. Além disso, confira se o XML está sendo assinado corretamente antes do envio.
+
+### [E6155] Xml declarado com prefixo de namespace.
+
