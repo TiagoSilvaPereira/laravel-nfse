@@ -51,7 +51,7 @@ class XmlBuilderService
         $xml = ArrayToXml::convert($dpsArray, [
             'rootElementName' => 'DPS',
             '_attributes' => [
-                'versao' => '1.00',
+                'versao' => config('services.nfse.version'),
                 'xmlns' => 'http://www.sped.fazenda.gov.br/nfse',
             ],
         ], true, 'UTF-8');

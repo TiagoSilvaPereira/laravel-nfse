@@ -36,6 +36,7 @@ return [
     ],
 
     'nfse' => [
+        'version' => env('NFSE_VERSION', '1.01'),
         'sefin_url' => env('NFSE_SEFIN_URL', 'https://sefin.nfse.gov.br/SefinNacional'),
         'sefin_url_homologation' => env('NFSE_SEFIN_URL_HOMOLOGATION', 'https://sefin.producaorestrita.nfse.gov.br/SefinNacional'),
         'adn_url' => env('NFSE_ADN_URL', 'https://adn.nfse.gov.br'),

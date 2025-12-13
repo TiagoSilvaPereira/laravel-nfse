@@ -150,5 +150,11 @@ Verifique se o XML está sendo gerado com a codificação UTF-8 e com o header c
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 ```
+### [RNG6110] Falha Schema Xml (The 'versao' attribute is invalid - The value '1.00' is invalid according to its datatype 'http://www.sped.fazenda.gov.br/nfse:TVerNFSe' - The Pattern constraint failed.)
 
+Provavelmente houve uma mudança de versão e a versão que está sendo enviada não é mais válida. Verifique a versão correta no schema e ajuste o código para enviar a versão correta. Verificar:
+
+```
+config('services.nfse.version')
+```
 
