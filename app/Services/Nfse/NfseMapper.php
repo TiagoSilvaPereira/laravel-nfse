@@ -14,7 +14,7 @@ class NfseMapper
      */
     public function toInternal(array $data): array
     {
-        // Data do Payload amigável
+        // Dados do Payload amigável
         $customer = $data['customer'];
         $service = $data['service'];
         $address = $customer['address'] ?? null;
