@@ -45,6 +45,7 @@ class NfseMapper
             'cTribNac' => $service['code'],
             'xDescServ' => $service['description'],
             'cLocPrestacao' => $service['location_code'] ?? null,
+            'cNBS' => $service['nbs_code'] ?? null,
         ];
 
         $valores = [
