@@ -137,7 +137,7 @@ class XmlBuilderService
             'cServ' => [
                 'cTribNac' => preg_replace('/\D/', '', $data['servico']['cTribNac']), // Código de Tributação Nacional (apenas números)
                 'xDescServ' => $data['servico']['xDescServ'],
-                'cNBS' => $data['servico']['cNBS'] ?? '115021000',
+                'cNBS' => $data['servico']['cNBS'],
             ],
         ];
 

@@ -158,3 +158,9 @@ Provavelmente houve uma mudança de versão e a versão que está sendo enviada 
 config('services.nfse.version')
 ```
 
+### [RNG6110] Falha Schema Xml (The element 'cServ' in namespace 'http://www.sped.fazenda.gov.br/nfse' has incomplete content. List of possible elements expected: 'cNBS' in namespace 'http://www.sped.fazenda.gov.br/nfse'.)
+
+Aparentemente o campo `cNBS` (Código Nacional de Atividade Econômica do Serviço) passou a ser obrigatório. Verifique o valor correto para o serviço prestado e envie esse campo no XML. Veja mais detalhes na portaria abaixo:
+
+https://www.econeteditora.com.br/bdi/port/p13/portaria1820_rfb_scs_anx_2013.php
+
