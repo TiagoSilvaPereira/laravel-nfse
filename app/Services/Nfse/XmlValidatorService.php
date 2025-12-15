@@ -63,9 +63,11 @@ class XmlValidatorService
     }
 
     /**
-     * Esse método é necessário pois o PHP não suporta alguns tipos de Regex no XSD, então
-     * fazemos uma cópia local dos schemas e aplicamos as correções necessárias, sem 
-     * modificar os arquivos originais.
+     * Esse método é necessário para corrigir problemas nos arquivos XSD originais. Por exemplo,
+     * o arquivo tiposSimples_v1.00.xsd possui alguns padrões de regex que não 
+     * são compatíveis com a validação do PHP. 
+     * Além disso, atualiza a versão do schema conforme configuração, pois às vezes
+     * a API da Sefaz modifica a versão mas os arquivos XSD não são atualizados.
      * @param string $source 
      * @param string $destination 
      * @return void 
@@ -85,6 +87,14 @@ class XmlValidatorService
                 $content = str_replace(
                     'pattern value="^(?!0{1,5}$)\d{1,5}$"',
                     'pattern value="[0-9]{1,5}"',
+                    $content
+                );
+
+                // Essa correção é feita para atualizar a versão do schema conforme configuração,
+                // caso a Sefaz modifique a versão mas não atualize os arquivos XSD.
+                $content = str_replace(
+                    '<xs:pattern value="1\.00"/>',
+                    '<xs:pattern value="' . config('services.nfse.version') . '"/>',
                     $content
                 );
 
