@@ -14,7 +14,12 @@ class StoreInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // Empresa emissora
             'company_id' => ['required', 'exists:companies,id'],
+
+            // Integração (opcional) - Identificador da nota no sistema externo
+            // Esse campo é muito importante para evitar duplicidade na emissão de notas,
+            // por exemplo, quando há falha de envio e o sistema tenta reenviar a nota.
             'integration_id' => ['nullable', 'string', 'max:48'],
             
             // Tomador
@@ -32,6 +37,7 @@ class StoreInvoiceRequest extends FormRequest
             'customer.address.zip_code' => ['nullable', 'string', 'max:8'],
             'customer.address.country_code' => ['nullable', 'string', 'max:4'],
 
+            // Serviço
             'service' => ['required', 'array'],
             'service.code' => ['required', 'string'], // cTribNac
             'service.nbs_code' => ['required', 'string'], // cNBS
