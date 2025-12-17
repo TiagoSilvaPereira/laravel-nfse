@@ -75,14 +75,7 @@ class PrepareInvoice
             );
         }
 
-        $invoice->update([
-            'status' => NfseStatus::DRAFT,
-            'status_message' => null,
-            'payload_json' => $payload,
-            'xml_dps_signed' => null,
-            'xml_nfse' => null,
-            'processing_at' => null,
-        ]);
+        $invoice->resetToDraft($payload);
 
         return $invoice->fresh();
     }

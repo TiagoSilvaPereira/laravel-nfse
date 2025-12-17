@@ -28,6 +28,7 @@ return new class extends Migration
             // Identificador único da integração (para idempotência do cliente)
             $table->string('integration_id', 48)->nullable()->index();
             
+            $table->timestamp('processing_at')->nullable();
             $table->string('status')->default(NfseStatus::DRAFT)->index(); 
             $table->text('status_message')->nullable();
             

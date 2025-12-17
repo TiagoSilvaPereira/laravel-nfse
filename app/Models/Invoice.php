@@ -44,4 +44,17 @@ class Invoice extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function resetToDraft(array $payload): void
+    {
+        $this->update([
+            'status' => NfseStatus::DRAFT,
+            'status_message' => null,
+            'processing_at' => null,
+            'xml_dps_signed' => null,
+            'xml_nfse' => null,
+            'danfse_pdf_url' => null,
+            'payload_json' => $payload,
+        ]);
+    }
 }
