@@ -96,7 +96,7 @@ class PrepareInvoice
             'environment' => $company->environment,
             'integration_id' => $integrationId,
             'status' => NfseStatus::DRAFT,
-            'payload_json' => $payload,
+            'payload' => $payload,
             
             // As numerações serão geradas no momento da emissão
             'dps_id' => null,

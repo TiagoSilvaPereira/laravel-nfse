@@ -29,13 +29,13 @@ class Invoice extends Model
         'xml_dps_signed',
         'xml_nfse',
         'danfse_pdf_url',
-        'payload_json',
+        'payload',
     ];
 
     protected $casts = [
         'environment' => NfseEnvironment::class,
         'status' => NfseStatus::class,
-        'payload_json' => 'array',
+        'payload' => 'array',
         'dps_number' => 'integer',
         'processing_at' => 'datetime',
     ];
@@ -54,7 +54,7 @@ class Invoice extends Model
             'xml_dps_signed' => null,
             'xml_nfse' => null,
             'danfse_pdf_url' => null,
-            'payload_json' => $payload,
+            'payload' => $payload,
         ]);
     }
 }

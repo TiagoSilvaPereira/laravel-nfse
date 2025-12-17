@@ -58,7 +58,7 @@ class AsyncEmissionTest extends TestCase
             'company_id' => $this->company->id,
             'integration_id' => 'test-001',
             'status' => NfseStatus::DRAFT,
-            'payload_json' => ['old' => 'data'],
+            'payload' => ['old' => 'data'],
         ]);
 
         $data = $this->getValidInvoiceData(['integration_id' => 'test-001']);
@@ -68,7 +68,7 @@ class AsyncEmissionTest extends TestCase
         $response->assertStatus(200);
 
         $invoice->refresh();
-        $this->assertNotEquals(['old' => 'data'], $invoice->payload_json);
+        $this->assertNotEquals(['old' => 'data'], $invoice->payload);
     }
 
     /** @test */

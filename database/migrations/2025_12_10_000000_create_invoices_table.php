@@ -36,7 +36,9 @@ return new class extends Migration
             $table->mediumText('xml_nfse')->nullable();
             $table->string('danfse_pdf_url')->nullable();
             
-            $table->json('payload_json')->nullable();
+            $table->json('payload')->nullable();
+
+            $table->json('alerts')->nullable();
             
             $table->timestamps();
 

@@ -33,7 +33,7 @@ class EmitInvoice
     public function execute(Invoice $invoice): Invoice
     {
         $company = $invoice->company;
-        $payload = $invoice->payload_json;
+        $payload = $invoice->payload;
 
         $this->xmlBuilder->setCompany($company);
         $this->signatureService->setCompany($company);
