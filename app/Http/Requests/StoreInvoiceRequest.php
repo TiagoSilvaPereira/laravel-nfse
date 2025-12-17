@@ -39,8 +39,8 @@ class StoreInvoiceRequest extends FormRequest
 
             // Serviço
             'service' => ['required', 'array'],
-            'service.code' => ['required', 'string'], // cTribNac
-            'service.nbs_code' => ['required', 'string'], // cNBS
+            'service.code' => ['required', 'string', 'max:6'], // cTribNac
+            'service.nbs_code' => ['required', 'string', 'max:9'], // cNBS
             'service.description' => ['required', 'string', 'max:2000'],
             'service.location_code' => ['nullable', 'string', 'size:7'], // cLocPrestacao
             'service.amount' => ['required', 'numeric', 'min:0.01'],

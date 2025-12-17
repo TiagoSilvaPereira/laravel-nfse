@@ -7,7 +7,11 @@ use App\Helpers\Tools;
 class NfseMapper
 {
     /**
-     * Converte o payload amigável da API para o formato interno da estrutura da NFS-e.
+     * Converte o payload amigável da API para o formato 
+     * interno da estrutura da NFS-e.
+     * 
+     * Isso permite desacoplar a API da estrutura específica da NFS-e,
+     * ao mesmo tempo que permite uma API mais simples e intuitiva.
      *
      * @param array $data
      * @return array
