@@ -69,20 +69,9 @@ class ProcessNfseEmission implements ShouldQueue
 
         try {
             $emitter->execute($invoice);
-            
-            Log::info('NFS-e emitida com sucesso', [
-                'invoice_id' => $invoice->id,
-                'dps_id' => $invoice->dps_id,
-            ]);
         } catch (NfseApiException $e) {
-            // # IMPORTANTE: Rejeição pela RFB - não deve retentar a emissão, 
-            // # por isso apenas atualizamos o status para REJECTED 
-            // # e retornamos
-            Log::warning('NFS-e rejeitada pela RFB', [
-                'invoice_id' => $invoice->id,
-                'error' => $e->getMessage(),
-            ]);
-            
+            // # IMPORTANTE: Rejeição pela RFB - não deve retentar a emissão
+            // # em casi de rejeição formal.
             return;
         } catch (\Throwable $e) {
             Log::error('Erro ao emitir NFS-e', [
@@ -91,7 +80,8 @@ class ProcessNfseEmission implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            // Re-lança a exceção para o Laravel tentar novamente
+            // # IMPORTANTE: Re-lança a exceção para o 
+            // # Laravel tentar novamente
             throw $e;
         }
     }
