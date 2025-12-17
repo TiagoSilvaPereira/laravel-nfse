@@ -3,9 +3,8 @@
 namespace App\Services\Nfse;
 
 use App\Exceptions\NfseApiException;
+use App\Models\Company;
 use App\Services\Nfse\Concerns\HasCompany;
-use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Storage;
 use Exception;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
@@ -14,38 +13,31 @@ class NfseTransmitter
 {
     use HasCompany;
 
+    protected NfseClient $client;
+
+    public function __construct(NfseClient $client)
+    {
+        $this->client = $client;
+    }
+
+    public function setCompany(Company $company): self
+    {
+        $this->company = $company;
+        $this->client->setCompany($company);
+        
+        return $this;
+    }
+
     public function transmit(string $signedXml): array
     {
-        $baseUrl = $this->calculateBaseUrl();
-        $finalUrl = rtrim($baseUrl, '/') . '/nfse';
-
         $compressedBase64Xml = $this->compressAndEncodeXml($signedXml);
 
         $payload = [
             'dpsXmlGZipB64' => $compressedBase64Xml
         ];
 
-        $certPath = $this->getCertificatePemPath();
-
-        $client = new Client([
-            'cert' => $certPath,
-            'headers' => [
-                'Content-Type' => 'application/json',
-            ],
-            'curl' => [
-                CURLOPT_SSLVERSION => 6, // TLS 1.2
-            ],
-        ]);
-
         try {
-
-            $response = $client->post($finalUrl, [
-                'json' => $payload
-            ]);
-
-            $body = json_decode($response->getBody()->getContents(), true);
-            
-            return $body;
+            return $this->client->postToSefin($payload);
         } catch (RequestException $e) {
 
             $responseBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'Sem resposta do servidor';
@@ -61,10 +53,6 @@ class NfseTransmitter
 
         } catch (\Exception $e) {
             throw new Exception("Erro na transmissão da NFS-e: " . $e->getMessage());
-        } finally {
-            if (file_exists($certPath) && str_contains($certPath, 'temp')) {
-                unlink($certPath);
-            }
         }
     }
 
@@ -72,38 +60,5 @@ class NfseTransmitter
     {
         $gzipped = gzencode($xml);
         return base64_encode($gzipped);
-    }
-
-    protected function calculateBaseUrl(): string
-    {
-        $productionUrl = config('services.nfse.sefin_url');
-        $homologationUrl = config('services.nfse.sefin_url_homologation');
-
-        return $this->company->isProduction()
-            ? $productionUrl
-            : $homologationUrl;
-    }
-
-    protected function getCertificatePemPath(): string
-    {
-        if (!Storage::exists($this->company->cert_path)) {
-            throw new Exception("Certificado PFX não encontrado.");
-        }
-
-        $pfxContent = Storage::get($this->company->cert_path);
-        $password = $this->company->cert_password;
-
-        $certs = [];
-        
-        if (!openssl_pkcs12_read($pfxContent, $certs, $password)) {
-            throw new Exception("Falha ao ler PFX para conversão.");
-        }
-
-        $pemContent = $certs['cert'] . "\n" . $certs['pkey'];
-
-        $tempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cert_' . $this->company->id . '_' . uniqid() . '.pem';
-        file_put_contents($tempPath, $pemContent);
-
-        return $tempPath;
     }
 }

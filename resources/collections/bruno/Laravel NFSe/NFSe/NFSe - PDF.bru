@@ -1,0 +1,16 @@
+meta {
+  name: NFSe - PDF
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/nfse/4/pdf
+  body: json
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
