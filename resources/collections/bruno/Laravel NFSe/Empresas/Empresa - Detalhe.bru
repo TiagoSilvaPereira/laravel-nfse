@@ -1,12 +1,12 @@
 meta {
-  name: Detalhe
+  name: Empresa - Detalhe
   type: http
   seq: 2
 }
 
 get {
-  url: {{baseUrl}}/nfse/1
-  body: json
+  url: {{baseUrl}}/companies/1
+  body: multipartForm
   auth: inherit
 }
 
