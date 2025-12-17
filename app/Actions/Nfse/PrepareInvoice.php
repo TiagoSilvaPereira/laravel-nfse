@@ -96,10 +96,10 @@ class PrepareInvoice
             'status' => NfseStatus::DRAFT,
             'payload_json' => $payload,
             
-            // O ID e número serão gerados no momento da emissão
+            // As numerações serão geradas no momento da emissão
             'dps_id' => null,
             'dps_number' => null,
-            'dps_series' => $company->dps_series,
+            'dps_series' => null,
         ]);
     }
 }

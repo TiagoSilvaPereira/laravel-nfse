@@ -22,7 +22,7 @@ return new class extends Migration
             // Chave de acesso da NFS-e - gerada pelo sistema da Sefaz
             $table->string('access_key', 50)->nullable(); 
             
-            $table->string('dps_series', 5)->default('00001');
+            $table->string('dps_series', 5)->default('00001')->nullable();
             $table->unsignedBigInteger('dps_number')->nullable();
 
             // Identificador único da integração (para idempotência do cliente)
