@@ -25,6 +25,7 @@ class Invoice extends Model
         'dps_series',
         'status',
         'status_message',
+        'processing_at',
         'xml_dps_signed',
         'xml_nfse',
         'danfse_pdf_url',
@@ -36,6 +37,7 @@ class Invoice extends Model
         'status' => NfseStatus::class,
         'payload_json' => 'array',
         'dps_number' => 'integer',
+        'processing_at' => 'datetime',
     ];
 
     public function company(): BelongsTo

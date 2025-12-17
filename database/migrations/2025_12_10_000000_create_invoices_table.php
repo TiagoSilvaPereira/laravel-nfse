@@ -17,13 +17,13 @@ return new class extends Migration
             $table->tinyInteger('environment')->default(NfseEnvironment::HOMOLOGATION);
 
             // Chave de idempotência - gerada pelo sistema emissor
-            $table->string('dps_id', 50)->unique();
+            $table->string('dps_id', 50)->unique()->nullable();
             
             // Chave de acesso da NFS-e - gerada pelo sistema da Sefaz
             $table->string('access_key', 50)->nullable(); 
             
-            $table->unsignedBigInteger('dps_number');
-            $table->string('dps_series', 5);
+            $table->string('dps_series', 5)->default('00001');
+            $table->unsignedBigInteger('dps_number')->nullable();
 
             // Identificador único da integração (para idempotência do cliente)
             $table->string('integration_id', 48)->nullable()->index();
@@ -35,7 +35,7 @@ return new class extends Migration
             $table->mediumText('xml_nfse')->nullable();
             $table->string('danfse_pdf_url')->nullable();
             
-            $table->json('payload_json');
+            $table->json('payload_json')->nullable();
             
             $table->timestamps();
 
