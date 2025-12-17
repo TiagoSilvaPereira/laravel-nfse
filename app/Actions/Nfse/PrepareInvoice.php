@@ -3,6 +3,7 @@
 namespace App\Actions\Nfse;
 
 use App\Enums\NfseStatus;
+use App\Jobs\ProcessNfseEmission;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Services\Nfse\NfseValidator;
@@ -31,6 +32,8 @@ class PrepareInvoice
         $integrationId = $payload['integration_id'] ?? null;
 
         $invoice = $this->handleInvoice($company, $payload, $integrationId);
+
+        ProcessNfseEmission::dispatch($invoice->id);
 
         return $invoice;
     }
