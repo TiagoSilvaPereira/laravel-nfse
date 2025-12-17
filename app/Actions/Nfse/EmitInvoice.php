@@ -93,14 +93,27 @@ class EmitInvoice
         try {
             $this->xmlValidator->validate($signedXml);
 
-            $this->transmitter->transmit($signedXml, $invoice->company);
+            $response = $this->transmitter->transmit($signedXml, $invoice->company);
             
-            $invoice->update([
+            $updateData = [
                 'status' => NfseStatus::AUTHORIZED,
                 'status_message' => 'Autorizada com sucesso',
                 'processing_at' => null,
-                // 'xml_nfse' => ... extrair do retorno quando implementar
-            ]);
+            ];
+
+            if (!empty($response['chaveAcesso'])) {
+                $updateData['access_key'] = $response['chaveAcesso'];
+            }
+
+            if (!empty($response['nfseXmlGZipB64'])) {
+                $updateData['xml_nfse'] = $response['nfseXmlGZipB64'];
+            }
+
+            if (!empty($response['alertas'])) {
+                $updateData['alerts'] = $response['alertas'];
+            }
+            
+            $invoice->update($updateData);
         } catch (NfseApiException $e) {
             $invoice->update([
                 'status' => NfseStatus::REJECTED,

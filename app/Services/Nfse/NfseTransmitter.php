@@ -46,7 +46,6 @@ class NfseTransmitter
             $body = json_decode($response->getBody()->getContents(), true);
             
             return $body;
-
         } catch (RequestException $e) {
 
             $responseBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'Sem resposta do servidor';

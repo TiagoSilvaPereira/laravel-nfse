@@ -13,6 +13,8 @@ Detalhes sobre a DPS (Documento Provisório de Serviço), que é o documento ini
 
 O número da DPS documenta as tentativas de emissão, e a NFS-e é o documento oficial. Ou seja, o controle da DPS é feito totalmente pelo sistema emissor, e a NFS-e é o documento que tem validade fiscal.
 
+Alertas da NFSe
+
 ## Obtenção do certificado digital
 
 ## Obtendo dados como URL das webservices, códigos de tributação, etc
