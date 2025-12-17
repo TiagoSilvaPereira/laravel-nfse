@@ -1,0 +1,16 @@
+meta {
+  name: Detalhe
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/nfse/1
+  body: json
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
