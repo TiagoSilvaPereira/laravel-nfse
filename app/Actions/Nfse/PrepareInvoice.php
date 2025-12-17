@@ -33,6 +33,12 @@ class PrepareInvoice
 
         $invoice = $this->handleInvoice($company, $payload, $integrationId);
 
+        if ($invoice->status !== NfseStatus::DRAFT) {
+            // # IMPORTANTE: Se a invoice já estiver autorizada,
+            // # ou em processamento, não faz sentido enfileirar novamente
+            return $invoice;
+        }
+
         ProcessNfseEmission::dispatch($invoice->id);
 
         return $invoice;

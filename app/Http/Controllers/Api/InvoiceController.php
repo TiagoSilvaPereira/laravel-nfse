@@ -27,7 +27,7 @@ class InvoiceController extends Controller
             $invoice = $prepareInvoice->execute($company, $internalData);
             
             return response()->json([
-                'message' => 'Nota fiscal enfileirada para emissão.',
+                'message' => 'Nota fiscal enviada para processamento.',
                 'data' => $invoice,
             ], $invoice->wasRecentlyCreated ? 201 : 200);
 

@@ -5,6 +5,8 @@
 ## Timezone do sistema
 O sistema deve estar configurado para o timezone "America/Sao_Paulo" (UTC-3)?
 
+## Importância do lockForUpdate na emissão de NFS-e
+
 ## Ciclo de vida da NFS-e (DPS, NFS-e, eventos, etc)
 
 Detalhes sobre a DPS (Documento Provisório de Serviço), que é o documento inicial, e depois a NFS-e que é o documento final.
