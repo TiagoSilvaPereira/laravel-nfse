@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 use Exception;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Log;
 
 class NfseTransmitter
 {
@@ -50,8 +51,8 @@ class NfseTransmitter
 
             $responseBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'Sem resposta do servidor';
             
-            \Illuminate\Support\Facades\Log::error("Erro no envio da DPS: " . $e->getMessage());
-            \Illuminate\Support\Facades\Log::error("Conteúdo da resposta de erro: " . $responseBody);
+            Log::error("Erro no envio da DPS: " . $e->getMessage());
+            Log::error("Conteúdo da resposta de erro: " . $responseBody);
 
             if ($e->hasResponse()) {
                 throw new NfseApiException($responseBody, $e->getCode(), $e);
