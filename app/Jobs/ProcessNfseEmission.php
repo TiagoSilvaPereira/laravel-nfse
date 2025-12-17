@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Actions\Nfse\EmitInvoice;
 use App\Enums\NfseStatus;
+use App\Exceptions\NfseApiException;
 use App\Models\Invoice;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Log;
  * 
  * Obs: Aumentamos o timeout padrão de 60s para 120s, pois
  * a emissão de NFS-e pode demorar mais dependendo da situação
- * da SEFAZ.
+ * da RFB.
  * 
  * Obs2: Implementamos backoff exponencial para tentativas
  * de reprocessamento em caso de falhas temporárias. A primeira
@@ -44,6 +45,9 @@ class ProcessNfseEmission implements ShouldQueue
 
     public function handle(EmitInvoice $emitter): void
     {
+        // # IMPORTANTE: Bloqueia a invoice para impedir que ela seja modificada
+        // # por outros serviços concorrentes, evitando a alteração incorreta
+        // # de estado ou processamento paralelo.
         $invoice = Invoice::query()
             ->lockForUpdate()
             ->find($this->invoiceId);
@@ -70,6 +74,16 @@ class ProcessNfseEmission implements ShouldQueue
                 'invoice_id' => $invoice->id,
                 'dps_id' => $invoice->dps_id,
             ]);
+        } catch (NfseApiException $e) {
+            // # IMPORTANTE: Rejeição pela RFB - não deve retentar a emissão, 
+            // # por isso apenas atualizamos o status para REJECTED 
+            // # e retornamos
+            Log::warning('NFS-e rejeitada pela RFB', [
+                'invoice_id' => $invoice->id,
+                'error' => $e->getMessage(),
+            ]);
+            
+            return;
         } catch (\Throwable $e) {
             Log::error('Erro ao emitir NFS-e', [
                 'invoice_id' => $invoice->id,
@@ -84,6 +98,10 @@ class ProcessNfseEmission implements ShouldQueue
 
     public function failed(\Throwable $exception): void
     {
+        if ($exception instanceof NfseApiException) {
+            return;
+        }
+
         $invoice = Invoice::find($this->invoiceId);
 
         if ($invoice) {

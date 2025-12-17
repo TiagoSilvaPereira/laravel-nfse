@@ -76,8 +76,9 @@ class EmitInvoice
             ];
         }
 
-        // IMPORTANTE: Bloqueia a empresa para evitar saltos ou duplicações do número da DPS,
-        // principalmente em cenários de alta concorrência.
+        // # IMPORTANTE: Bloqueia a empresa para evitar saltos 
+        // # ou duplicações do número da DPS, principalmente em
+        // # cenários de alta concorrência.
         $company = $company->lockForUpdate()->find($company->id);
         $company->increment('last_dps_number');
 

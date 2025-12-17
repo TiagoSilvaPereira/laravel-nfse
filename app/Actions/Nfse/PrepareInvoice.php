@@ -54,9 +54,9 @@ class PrepareInvoice
             return null;
         }
 
-        // IMPORTANTE: Bloqueia a invoice para impedir que ela seja modificada
-        // por outros serviços concorrentes, evitando que o estado retornado
-        // esteja desatualizado.
+        // # IMPORTANTE: Bloqueia a invoice para impedir que ela seja modificada
+        // # por outros serviços concorrentes, evitando que o estado retornado
+        // # esteja desatualizado.
         return $company->invoices()
             ->where('integration_id', $integrationId)
             ->lockForUpdate()

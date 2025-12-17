@@ -19,7 +19,7 @@ return new class extends Migration
             // Chave de idempotência - gerada pelo sistema emissor
             $table->string('dps_id', 50)->unique()->nullable();
             
-            // Chave de acesso da NFS-e - gerada pelo sistema da Sefaz
+            // Chave de acesso da NFS-e - gerada pelo sistema da RFB
             $table->string('access_key', 50)->nullable(); 
             
             $table->string('dps_series', 5)->default('00001')->nullable();

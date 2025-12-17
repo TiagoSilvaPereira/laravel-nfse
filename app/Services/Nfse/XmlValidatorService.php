@@ -67,7 +67,7 @@ class XmlValidatorService
      * o arquivo tiposSimples_v1.00.xsd possui alguns padrões de regex que não 
      * são compatíveis com a validação do PHP. 
      * Além disso, atualiza a versão do schema conforme configuração, pois às vezes
-     * a API da Sefaz modifica a versão mas os arquivos XSD não são atualizados.
+     * a API da RFB modifica a versão mas os arquivos XSD não são atualizados.
      * @param string $source 
      * @param string $destination 
      * @return void 
@@ -91,7 +91,7 @@ class XmlValidatorService
                 );
 
                 // Essa correção é feita para atualizar a versão do schema conforme configuração,
-                // caso a Sefaz modifique a versão mas não atualize os arquivos XSD.
+                // caso a RFB modifique a versão mas não atualize os arquivos XSD.
                 $content = str_replace(
                     '<xs:pattern value="1\.00"/>',
                     '<xs:pattern value="' . config('services.nfse.version') . '"/>',
