@@ -39,7 +39,7 @@ class EmitInvoice
         $this->signatureService->setCompany($company);
         $this->transmitter->setCompany($company);
 
-        return DB::transaction(function () use ($invoice, $company, $payload) {
+        $signedXml = DB::transaction(function () use ($invoice, $company, $payload) {
             $dpsInfo = $this->resolveDpsInfo($invoice, $company);
             
             $payload['nDPS'] = $dpsInfo['number'];
@@ -59,10 +59,12 @@ class EmitInvoice
                 'status' => NfseStatus::PROCESSING,
             ]);
 
-            $this->transmitAndUpdateStatus($invoice, $signedXml);
-
-            return $invoice->fresh();
+            return $signedXml;
         });
+
+        $this->transmitAndUpdateStatus($invoice, $signedXml);
+
+        return $invoice->fresh();
     }
 
     protected function resolveDpsInfo(Invoice $invoice, $company): array
