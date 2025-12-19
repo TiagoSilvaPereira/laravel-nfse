@@ -62,6 +62,12 @@ class EmitInvoice
             return $signedXml;
         });
 
+        // # IMPORTANTE: A transmissão da NFS-e é feita fora da transação
+        // # para evitar locks prolongados no banco de dados, que poderiam
+        // # impactar a performance e concorrência do sistema. Caso
+        // # ocorra uma falha extraordinária, um serviço de reprocessamento
+        // # poderá ser implementado para tentar reenviar notas que
+        // # ficaram presas em estado PROCESSING.
         $this->transmitAndUpdateStatus($invoice, $signedXml);
 
         return $invoice->fresh();
