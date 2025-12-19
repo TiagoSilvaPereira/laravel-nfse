@@ -15,6 +15,8 @@ class SyncPendingInvoices extends Command
 
     public function handle(NfseClient $client): int
     {
+        $this->info('Iniciando sincronização de invoices pendentes...');
+        
         $oneHourAgo = now()->subHour();
 
         $pendingInvoices = Invoice::query()
