@@ -68,6 +68,90 @@ class NfseClient
         }
     }
 
+    public function checkDpsExists(string $dpsId): bool
+    {
+        $this->ensureCompanyIsSet();
+        
+        $baseUrl = $this->getSefinBaseUrl();
+        $url = rtrim($baseUrl, '/') . '/dps/' . $dpsId;
+        
+        $certPath = $this->getCertificateFromCompany();
+
+        try {
+            $client = new Client();
+
+            $response = $client->head($url, [
+                'cert' => $certPath,
+                'curl' => [
+                    CURLOPT_SSLVERSION => 6, // TLS 1.2
+                ],
+                'http_errors' => false,
+            ]);
+
+            return $response->getStatusCode() === 200;
+        } catch (Exception $e) {
+            return false;
+        } finally {
+            $this->cleanupTempCert($certPath);
+        }
+    }
+
+    public function getDpsInfo(string $dpsId): array
+    {
+        $this->ensureCompanyIsSet();
+        
+        $baseUrl = $this->getSefinBaseUrl();
+        $url = rtrim($baseUrl, '/') . '/dps/' . $dpsId;
+        
+        $certPath = $this->getCertificateFromCompany();
+
+        try {
+            $client = new Client();
+
+            $response = $client->get($url, [
+                'cert' => $certPath,
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+                'curl' => [
+                    CURLOPT_SSLVERSION => 6, // TLS 1.2
+                ],
+            ]);
+
+            return json_decode($response->getBody()->getContents(), true);
+        } finally {
+            $this->cleanupTempCert($certPath);
+        }
+    }
+
+    public function getNfseByAccessKey(string $accessKey): array
+    {
+        $this->ensureCompanyIsSet();
+        
+        $baseUrl = $this->getSefinBaseUrl();
+        $url = rtrim($baseUrl, '/') . '/nfse/' . $accessKey;
+        
+        $certPath = $this->getCertificateFromCompany();
+
+        try {
+            $client = new Client();
+
+            $response = $client->get($url, [
+                'cert' => $certPath,
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+                'curl' => [
+                    CURLOPT_SSLVERSION => 6, // TLS 1.2
+                ],
+            ]);
+
+            return json_decode($response->getBody()->getContents(), true);
+        } finally {
+            $this->cleanupTempCert($certPath);
+        }
+    }
+
     protected function ensureCompanyIsSet(): void
     {
         if (!isset($this->company)) {
