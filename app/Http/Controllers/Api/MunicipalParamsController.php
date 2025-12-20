@@ -5,10 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Services\Nfse\NfseClient;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class MunicipalParamsController extends Controller
 {
@@ -29,20 +27,10 @@ class MunicipalParamsController extends Controller
         
         $this->nfseClient->setCompany($company);
 
-        try {
-            $params = $this->nfseClient->getMunicipalConventionParams($cityCode);
-            return response()->json($params);
-        } catch (RequestException $e) {
-            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 500;
-            $errorBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'Erro interno do servidor';
-
-            return response()->json([
-                'error' => 'Erro na API ADN',
-                'message' => 'Falha ao consultar convênio municipal',
-                'details' => json_decode($errorBody, true) ?: $errorBody,
-                'status_code' => $statusCode
-            ], $statusCode);
-        }
+        return $this->handleServiceCall(
+            fn() => $this->nfseClient->getMunicipalConventionParams($cityCode),
+            'Falha ao consultar convênio municipal'
+        );
     }
 
     /**
@@ -58,20 +46,10 @@ class MunicipalParamsController extends Controller
         
         $this->nfseClient->setCompany($company);
 
-        try {
-            $params = $this->nfseClient->getMunicipalAliquota($cityCode, $serviceCode, $competencia);
-            return response()->json($params);
-        } catch (RequestException $e) {
-            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 500;
-            $errorBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'Erro interno do servidor';
-
-            return response()->json([
-                'error' => 'Erro na API ADN',
-                'message' => 'Falha ao consultar alíquota municipal',
-                'details' => json_decode($errorBody, true) ?: $errorBody,
-                'status_code' => $statusCode
-            ], $statusCode);
-        }
+        return $this->handleServiceCall(
+            fn() => $this->nfseClient->getMunicipalAliquota($cityCode, $serviceCode, $competencia),
+            'Falha ao consultar alíquota municipal'
+        );
     }
 
     /**
@@ -87,20 +65,10 @@ class MunicipalParamsController extends Controller
         
         $this->nfseClient->setCompany($company);
 
-        try {
-            $params = $this->nfseClient->getMunicipalHistoricoAliquotas($cityCode, $serviceCode);
-            return response()->json($params);
-        } catch (RequestException $e) {
-            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 500;
-            $errorBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'Erro interno do servidor';
-
-            return response()->json([
-                'error' => 'Erro na API ADN',
-                'message' => 'Falha ao consultar histórico de alíquotas',
-                'details' => json_decode($errorBody, true) ?: $errorBody,
-                'status_code' => $statusCode
-            ], $statusCode);
-        }
+        return $this->handleServiceCall(
+            fn() => $this->nfseClient->getMunicipalHistoricoAliquotas($cityCode, $serviceCode),
+            'Falha ao consultar histórico de alíquotas'
+        );
     }
 
     /**
@@ -116,20 +84,10 @@ class MunicipalParamsController extends Controller
         
         $this->nfseClient->setCompany($company);
 
-        try {
-            $params = $this->nfseClient->getMunicipalBeneficio($cityCode, $numeroBeneficio, $competencia);
-            return response()->json($params);
-        } catch (RequestException $e) {
-            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 500;
-            $errorBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'Erro interno do servidor';
-
-            return response()->json([
-                'error' => 'Erro na API ADN',
-                'message' => 'Falha ao consultar benefício municipal',
-                'details' => json_decode($errorBody, true) ?: $errorBody,
-                'status_code' => $statusCode
-            ], $statusCode);
-        }
+        return $this->handleServiceCall(
+            fn() => $this->nfseClient->getMunicipalBeneficio($cityCode, $numeroBeneficio, $competencia),
+            'Falha ao consultar benefício municipal'
+        );
     }
 
     /**
@@ -145,20 +103,10 @@ class MunicipalParamsController extends Controller
         
         $this->nfseClient->setCompany($company);
 
-        try {
-            $params = $this->nfseClient->getMunicipalRegimesEspeciais($cityCode, $serviceCode, $competencia);
-            return response()->json($params);
-        } catch (RequestException $e) {
-            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 500;
-            $errorBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'Erro interno do servidor';
-
-            return response()->json([
-                'error' => 'Erro na API ADN',
-                'message' => 'Falha ao consultar regimes especiais',
-                'details' => json_decode($errorBody, true) ?: $errorBody,
-                'status_code' => $statusCode
-            ], $statusCode);
-        }
+        return $this->handleServiceCall(
+            fn() => $this->nfseClient->getMunicipalRegimesEspeciais($cityCode, $serviceCode, $competencia),
+            'Falha ao consultar regimes especiais'
+        );
     }
 
     /**
@@ -174,19 +122,32 @@ class MunicipalParamsController extends Controller
         
         $this->nfseClient->setCompany($company);
 
-        try {
-            $params = $this->nfseClient->getMunicipalRetencoes($cityCode, $competencia);
-            return response()->json($params);
-        } catch (RequestException $e) {
-            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 500;
-            $errorBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'Erro interno do servidor';
+        return $this->handleServiceCall(
+            fn() => $this->nfseClient->getMunicipalRetencoes($cityCode, $competencia),
+            'Falha ao consultar retenções municipais'
+        );
+    }
+
+    /**
+     * Helper para executar chamadas de serviço e tratar erros padronizados
+     */
+    protected function handleServiceCall(callable $callback, string $errorMessage): JsonResponse
+    {
+        $response = $callback();
+
+        if (isset($response['_error'])) {
+            $errorBody = $response['error_body'];
+            $details = json_decode($errorBody, true);
 
             return response()->json([
                 'error' => 'Erro na API ADN',
-                'message' => 'Falha ao consultar retenções municipais',
-                'details' => json_decode($errorBody, true) ?: $errorBody,
-                'status_code' => $statusCode
-            ], $statusCode);
+                'message' => $errorMessage,
+                'details' => $details ?: $errorBody,
+                'status_code' => $response['status_code']
+            ], $response['status_code']);
         }
+
+        return response()->json($response);
     }
 }
+

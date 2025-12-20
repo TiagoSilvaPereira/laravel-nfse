@@ -1,0 +1,20 @@
+meta {
+  name: Hitórico de Alíquotas
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/parametros/{{municipalityCode}}/servico/11.50.22.000/historicoaliquotas?company_id=1
+  body: none
+  auth: inherit
+}
+
+params:query {
+  company_id: 1
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
