@@ -128,8 +128,6 @@ class EmitInvoice
                 'status_message' => $e->getMessage(),
                 'processing_at' => null,
             ]);
-            
-            throw $e;
         } catch (Exception $e) {
             $invoice->update([
                 'status' => NfseStatus::ERROR,

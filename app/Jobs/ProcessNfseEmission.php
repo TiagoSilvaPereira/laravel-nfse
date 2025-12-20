@@ -69,10 +69,6 @@ class ProcessNfseEmission implements ShouldQueue
 
         try {
             $emitter->execute($invoice);
-        } catch (NfseApiException $e) {
-            // # IMPORTANTE: Rejeição pela RFB - não deve retentar a emissão
-            // # em casi de rejeição formal.
-            return;
         } catch (\Throwable $e) {
             Log::error('Erro ao emitir NFS-e', [
                 'invoice_id' => $invoice->id,
@@ -88,6 +84,9 @@ class ProcessNfseEmission implements ShouldQueue
 
     public function failed(\Throwable $exception): void
     {
+        // Apenas uma segurança, teóricamente o NfseApiException
+        // já é tratado dentro do serviço EmitInvoice.php e
+        // nunca deveria chegar aqui.
         if ($exception instanceof NfseApiException) {
             return;
         }
