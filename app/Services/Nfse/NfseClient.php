@@ -156,101 +156,40 @@ class NfseClient
 
     public function getMunicipalConventionParams(string $cityCode): array
     {
-        $this->ensureCompanyIsSet();
-        
-        $baseUrl = $this->getAdnBaseUrl();
-        $url = rtrim($baseUrl, '/') . '/parametrizacao/' . $cityCode . '/convenio';
-        
-        $certPath = $this->getCertificateFromCompany();
-
-        try {
-            $client = new Client();
-
-            $response = $client->get($url, [
-                'cert' => $certPath,
-                'headers' => [
-                    'Accept' => 'application/json',
-                ],
-                'curl' => [
-                    CURLOPT_SSLVERSION => 6, // TLS 1.2
-                ],
-            ]);
-
-            return json_decode($response->getBody()->getContents(), true);
-        } catch (RequestException $e) {
-            $errorBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'No response body';
-            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 500;
-            
-            Log::error('Erro na API ADN - getMunicipalConventionParams', [
-                'url' => $url,
-                'status_code' => $statusCode,
-                'error_body' => $errorBody,
-                'company_id' => $this->company->id ?? null,
-            ]);
-
-            return [
-                '_error' => true,
-                'status_code' => $statusCode,
-                'error_body' => $errorBody,
-                'message' => 'Erro na API ADN'
-            ];
-        } finally {
-            $this->cleanupTempCert($certPath);
-        }
+        return $this->sendAdnRequest('/parametrizacao/' . $cityCode . '/convenio');
     }
 
     public function getMunicipalAliquota(string $cityCode, string $serviceCode, string $competencia): array
     {
-        $this->ensureCompanyIsSet();
-        
-        $baseUrl = $this->getAdnBaseUrl();
-        $url = rtrim($baseUrl, '/') . '/parametrizacao/' . $cityCode . '/' . $serviceCode . '/' . $competencia . '/aliquota';
-        
-        $certPath = $this->getCertificateFromCompany();
-
-        try {
-            $client = new Client();
-
-            $response = $client->get($url, [
-                'cert' => $certPath,
-                'headers' => [
-                    'Accept' => 'application/json',
-                ],
-                'curl' => [
-                    CURLOPT_SSLVERSION => 6, // TLS 1.2
-                ],
-            ]);
-
-            return json_decode($response->getBody()->getContents(), true);
-        } catch (RequestException $e) {
-            $errorBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'No response body';
-            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 500;
-            
-            Log::error('Erro na API ADN - getMunicipalAliquota', [
-                'url' => $url,
-                'status_code' => $statusCode,
-                'error_body' => $errorBody,
-                'company_id' => $this->company->id ?? null,
-            ]);
-
-            // Retornar dados de erro ao invés de lançar exception
-            return [
-                '_error' => true,
-                'status_code' => $statusCode,
-                'error_body' => $errorBody,
-                'message' => 'Erro na API ADN'
-            ];
-        } finally {
-            $this->cleanupTempCert($certPath);
-        }
+        return $this->sendAdnRequest('/parametrizacao/' . $cityCode . '/' . $serviceCode . '/' . $competencia . '/aliquota');
     }
 
     public function getMunicipalHistoricoAliquotas(string $cityCode, string $serviceCode): array
     {
+        return $this->sendAdnRequest('/parametrizacao/' . $cityCode . '/' . $serviceCode . '/historicoaliquotas');
+    }
+
+    public function getMunicipalBeneficio(string $cityCode, string $numeroBeneficio, string $competencia): array
+    {
+        return $this->sendAdnRequest('/parametrizacao/' . $cityCode . '/' . $numeroBeneficio . '/' . $competencia . '/beneficio');
+    }
+
+    public function getMunicipalRetencoes(string $cityCode, string $competencia): array
+    {
+        return $this->sendAdnRequest('/parametrizacao/' . $cityCode . '/' . $competencia . '/retencoes');
+    }
+
+    public function getMunicipalRegimesEspeciais(string $cityCode, string $serviceCode, string $competencia): array
+    {
+        return $this->sendAdnRequest('/parametrizacao/' . $cityCode . '/' . $serviceCode . '/' . $competencia . '/regimes_especiais');
+    }
+
+    protected function sendAdnRequest(string $endpoint): array
+    {
         $this->ensureCompanyIsSet();
         
         $baseUrl = $this->getAdnBaseUrl();
-        $url = rtrim($baseUrl, '/') . '/parametrizacao/' . $cityCode . '/' . $serviceCode . '/historicoaliquotas';
+        $url = rtrim($baseUrl, '/') . $endpoint;
         
         $certPath = $this->getCertificateFromCompany();
 
@@ -272,7 +211,7 @@ class NfseClient
             $errorBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'No response body';
             $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 500;
             
-            Log::error('Erro na API ADN - getMunicipalHistoricoAliquotas', [
+            Log::error('Erro na API ADN - ' . $endpoint, [
                 'url' => $url,
                 'status_code' => $statusCode,
                 'error_body' => $errorBody,
@@ -285,117 +224,6 @@ class NfseClient
                 'error_body' => $errorBody,
                 'message' => 'Erro na API ADN'
             ];
-        } finally {
-            $this->cleanupTempCert($certPath);
-        }
-    }
-
-    public function getMunicipalBeneficio(string $cityCode, string $numeroBeneficio, string $competencia): array
-    {
-        $this->ensureCompanyIsSet();
-        
-        $baseUrl = $this->getAdnBaseUrl();
-        $url = rtrim($baseUrl, '/') . '/parametrizacao/' . $cityCode . '/' . $numeroBeneficio . '/' . $competencia . '/beneficio';
-        
-        $certPath = $this->getCertificateFromCompany();
-
-        try {
-            $client = new Client();
-
-            $response = $client->get($url, [
-                'cert' => $certPath,
-                'headers' => [
-                    'Accept' => 'application/json',
-                ],
-                'curl' => [
-                    CURLOPT_SSLVERSION => 6, // TLS 1.2
-                ],
-            ]);
-
-            return json_decode($response->getBody()->getContents(), true);
-        } catch (RequestException $e) {
-            $errorBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'No response body';
-            Log::error('Erro na API ADN - getMunicipalBeneficio', [
-                'url' => $url,
-                'status_code' => $e->hasResponse() ? $e->getResponse()->getStatusCode() : null,
-                'error_body' => $errorBody,
-                'company_id' => $this->company->id ?? null,
-            ]);
-            throw $e;
-        } finally {
-            $this->cleanupTempCert($certPath);
-        }
-    }
-
-    public function getMunicipalRetencoes(string $cityCode, string $competencia): array
-    {
-        $this->ensureCompanyIsSet();
-        
-        $baseUrl = $this->getAdnBaseUrl();
-        $url = rtrim($baseUrl, '/') . '/parametrizacao/' . $cityCode . '/' . $competencia . '/retencoes';
-        
-        $certPath = $this->getCertificateFromCompany();
-
-        try {
-            $client = new Client();
-
-            $response = $client->get($url, [
-                'cert' => $certPath,
-                'headers' => [
-                    'Accept' => 'application/json',
-                ],
-                'curl' => [
-                    CURLOPT_SSLVERSION => 6, // TLS 1.2
-                ],
-            ]);
-
-            return json_decode($response->getBody()->getContents(), true);
-        } catch (RequestException $e) {
-            $errorBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'No response body';
-            Log::error('Erro na API ADN - getMunicipalRetencoes', [
-                'url' => $url,
-                'status_code' => $e->hasResponse() ? $e->getResponse()->getStatusCode() : null,
-                'error_body' => $errorBody,
-                'company_id' => $this->company->id ?? null,
-            ]);
-            throw $e;
-        } finally {
-            $this->cleanupTempCert($certPath);
-        }
-    }
-
-    public function getMunicipalRegimesEspeciais(string $cityCode, string $serviceCode, string $competencia): array
-    {
-        $this->ensureCompanyIsSet();
-        
-        $baseUrl = $this->getAdnBaseUrl();
-        $url = rtrim($baseUrl, '/') . '/parametrizacao/' . $cityCode . '/' . $serviceCode . '/' . $competencia . '/regimes_especiais';
-        
-        $certPath = $this->getCertificateFromCompany();
-
-        try {
-            $client = new Client();
-
-            $response = $client->get($url, [
-                'cert' => $certPath,
-                'headers' => [
-                    'Accept' => 'application/json',
-                ],
-                'curl' => [
-                    CURLOPT_SSLVERSION => 6, // TLS 1.2
-                ],
-            ]);
-
-            return json_decode($response->getBody()->getContents(), true);
-        } catch (RequestException $e) {
-            $errorBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'No response body';
-            Log::error('Erro na API ADN - getMunicipalRegimesEspeciais', [
-                'url' => $url,
-                'status_code' => $e->hasResponse() ? $e->getResponse()->getStatusCode() : null,
-                'error_body' => $errorBody,
-                'company_id' => $this->company->id ?? null,
-            ]);
-            throw $e;
         } finally {
             $this->cleanupTempCert($certPath);
         }
