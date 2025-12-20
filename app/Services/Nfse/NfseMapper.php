@@ -53,8 +53,7 @@ class NfseMapper
         ];
 
         $valores = [
-            'vServ' => $service['amount'],
-            'pAliq' => $service['tax_rate'] ?? 0,
+            'vServ' => $service['amount']
         ];
 
         return [

@@ -44,7 +44,6 @@ class StoreInvoiceRequest extends FormRequest
             'service.description' => ['required', 'string', 'max:2000'],
             'service.location_code' => ['nullable', 'string', 'size:7'], // cLocPrestacao
             'service.amount' => ['required', 'numeric', 'min:0.01'],
-            'service.tax_rate' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 }

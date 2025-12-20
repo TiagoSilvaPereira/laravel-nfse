@@ -105,10 +105,10 @@ $dadosNota = [
         }
     },
     "service": {
-        "code": "01.07.01",
-        "description": "Consultoria em TI",
+        "code": "010101",
+        "nbs_code": "115021000",
+        "description": "Desenvolvimento de Software",
         "amount": 1500.00,
-        "tax_rate": 2.0
     }
 }
 ```

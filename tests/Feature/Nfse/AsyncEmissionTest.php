@@ -175,7 +175,6 @@ class AsyncEmissionTest extends TestCase
                 'nbs_code' => '0101010',
                 'description' => 'Serviço de teste',
                 'amount' => 1000.00,
-                'tax_rate' => 5.00,
             ],
         ], $overrides);
     }
