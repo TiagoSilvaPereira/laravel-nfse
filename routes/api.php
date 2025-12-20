@@ -30,6 +30,6 @@ Route::prefix('parametros')->group(function () {
     Route::get('{cityCode}/servico/{serviceCode}/{competencia}/aliquota', [MunicipalParamsController::class, 'getAliquota']);
     Route::get('{cityCode}/servico/{serviceCode}/historicoaliquotas', [MunicipalParamsController::class, 'getHistoricoAliquotas']);
     Route::get('{cityCode}/{numeroBeneficio}/{competencia}/beneficio', [MunicipalParamsController::class, 'getBeneficio']);
-    Route::get('{cityCode}/{serviceCode}/{competencia}/regimes_especiais', [MunicipalParamsController::class, 'getRegimesEspeciais']);
+    Route::get('{cityCode}/servico/{serviceCode}/{competencia}/regimes-especiais', [MunicipalParamsController::class, 'getRegimesEspeciais']);
     Route::get('{cityCode}/{competencia}/retencoes', [MunicipalParamsController::class, 'getRetencoes']);
 });
