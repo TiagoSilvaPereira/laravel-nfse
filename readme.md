@@ -24,6 +24,10 @@ Você pode acessar a documentação direto na Wiki do GitHub:
 
 - [Documentação Técnica Completa](https://github.com/TiagoSilvaPereira/laravel-nfse/wiki)
 
+# Onde encontrar as collections de API?
+
+Utilizei o [Bruno](https://www.usebruno.com/) como cliente REST para testar a API. Você pode encontrar as collections exportadas na pasta `resources/collections/bruno`.
+
 # Como contribuir
 
 Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull requests com melhorias, correções de bugs ou novas funcionalidades.
