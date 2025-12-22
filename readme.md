@@ -10,6 +10,8 @@ Atualmente, o projeto consegue emitir algumas **NFSe simples em ambiente de homo
 
 Esse código NÃO foi testado em produção e NÃO deve ser utilizado em ambientes reais sem uma revisão completa.
 
+![img](https://private-user-images.githubusercontent.com/11933789/529332482-a5143074-6bf4-4800-8ef5-d4413b81942b.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjY0MjY5NjYsIm5iZiI6MTc2NjQyNjY2NiwicGF0aCI6Ii8xMTkzMzc4OS81MjkzMzI0ODItYTUxNDMwNzQtNmJmNC00ODAwLThlZjUtZDQ0MTNiODE5NDJiLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEyMjIlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMjIyVDE4MDQyNlomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTIxMWRlYWZkNWZiZWZjNGUxYmMyNjdjNTBlM2M1YWZiNWYwOTRlNjdlZDgzNDc3NjYzMjA1Nzc1OTIzYmU4MzMmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.Ti1heMP3LKcwZsN07_X_qKi1R3gM2QPj1xmJuK6IIuo)
+
 # 🚨 IMPORTANTE 🚨
 
 Este projeto está em estágio inicial e **NÃO deve ser utilizado em produção sem uma revisão completa**. Ele serve como um ponto de partida para desenvolvedores que desejam entender o fluxo de emissão de NFS-e no padrão nacional.
