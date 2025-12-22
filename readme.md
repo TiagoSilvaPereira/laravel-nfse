@@ -16,7 +16,7 @@ Este projeto está em estágio inicial e **NÃO deve ser utilizado em produção
 
 Não há garantias de funcionamento, segurança ou conformidade legal. Consulte sempre um contador ou especialista tributário antes de utilizar este código em ambientes reais.
 
-Não me responsabilizo por quaisquer problemas decorrentes do uso deste código. Ele é totalmente aberto para que você possa adaptá-lo conforme suas necessidades e aprender com ele.
+**Não me responsabilizo por quaisquer problemas decorrentes do uso deste código. Ele é totalmente aberto para que você possa adaptá-lo conforme suas necessidades e aprender com ele.**
 
 # Documentação
 
