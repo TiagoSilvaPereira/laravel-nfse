@@ -1,170 +1,21 @@
-# Passo à passo para emissão de Nota Fiscal de Serviço Eletrônica (padrão nacional) com Laravel
+# Introdução
 
-## Introdução
+Olá! Este projeto estava sendo criado para ser um curso completo sobre a emissão de **Nota Fiscal de Serviço Eletrônica (NFS-e) no padrão nacional com Laravel**.
 
-## Timezone do sistema
-O sistema deve estar configurado para o timezone "America/Sao_Paulo" (UTC-3)?
+Mas, sendo muito sincero, estou totalmente sem energia para terminá-lo. 
 
-## Importância do lockForUpdate na emissão de NFS-e
+Então resolvi reunir o que já foi feito e disponibilizar como um pacote open source para a comunidade.
 
-## Ciclo de vida da NFS-e (DPS, NFS-e, eventos, etc)
+# 🚨 IMPORTANTE 🚨
 
-Detalhes sobre a DPS (Documento Provisório de Serviço), que é o documento inicial, e depois a NFS-e que é o documento final.
+Este projeto está em estágio inicial e não deve ser utilizado em produção sem uma revisão completa. Ele serve como um ponto de partida para desenvolvedores que desejam entender o fluxo de emissão de NFS-e no padrão nacional.
 
-O número da DPS documenta as tentativas de emissão, e a NFS-e é o documento oficial. Ou seja, o controle da DPS é feito totalmente pelo sistema emissor, e a NFS-e é o documento que tem validade fiscal.
+Não há garantias de funcionamento, segurança ou conformidade legal. Consulte sempre um contador ou especialista tributário antes de utilizar este código em ambientes reais.
 
-Alertas da NFSe
+Não me responsabilizo por quaisquer problemas decorrentes do uso deste código. Ele é totalmente aberto para que você possa adaptá-lo conforme suas necessidades e aprender com ele.
 
-## Obtenção do certificado digital
+# Documentação
 
-## Obtendo dados como URL das webservices, códigos de tributação, etc
+Você pode acessar a documentação direto na Wiki do GitHub:
 
-## Corrigindo problemas com certificado com algoritmo legado
-
-Criar também um utilitário para corrigir certificados com algoritmos legados.
-
-## Criar projeto Laravel + API (com autenticação)
-
-## Criar migrations
-
-Explicar sobre idempotência de notas fiscais, e também a necessidade do id de integração com o sistema externo, para evitar duplicidade.
-
-## Criar models
-Senha do certificado deve ser encriptada no banco de dados, e por isso usamos o cast para isso. Veja o exemplo abaixo:
-
-```php
-protected $casts = [
-    'cert_password' => 'encrypted',
-];
-```
-
-## Criar rotas para cadastrar empresa emissora e enviar certificado
-
-## Criar o serviço para lidar com certificados
-
-## Criar o serviço de assinatura do XML
-
-## Criar o serviço que monta o XML da DPS
-
-Garantir que o XML seja gerado com encoding UTF-8 e assinado corretamente, além de comprimido e codificado em base64.
-
-## Utilitário para corrigir certificado
-
-## Emails
-
-- Email de nota emitida para o tomador com link para a NFS-e
-- Email diário ou semanal ou mensal com relatórios de notas com falha
-- Email diário ou semanal ou mensal com relatórios de notas emitidas
-- Email de notificação de vencimento do certificado (30, 15, 7, 3, 1 dias antes)
-
-## Autenticação na API
-
-## Lista de cidades (banco) e lista de países (config)
-
-## Emissão sem o Mapper
-
-```php
-$dadosNota = [
-    'tomador' => [
-        'cpfCnpj' => '12345678900', // Ou nif => '...' se exterior
-        'xNome' => 'Fulano de Tal',
-        'endereco' => [
-            'xLgr' => 'Rua Teste',
-            'nro' => '123',
-            'cPais' => '1058', // 1058 = Brasil
-            'cMun' => '3550308', // Código IBGE (SP)
-            // ...
-        ]
-    ],
-    'servico' => [
-        'cTribNac' => '010101', // Código de tributação
-        'xDescServ' => 'Desenvolvimento de Software',
-        'cLocPrestacao' => '3550308',
-    ],
-    'valores' => [
-        'vServ' => 100.00,
-        'pAliq' => 2.00,
-    ]
-];
-```
-
-## Emissão com o Mapper
-
-```json
-{
-    "company_id": 1,
-    "customer": {
-        "name": "João da Silva",
-        "document": "12345678900",
-        "address": {
-            "street": "Av. Paulista",
-            "number": "1000",
-            "district": "Bela Vista",
-            "city_code": "3550308",
-            "zip_code": "01310100"
-        }
-    },
-    "service": {
-        "code": "010101",
-        "nbs_code": "115021000",
-        "description": "Desenvolvimento de Software",
-        "amount": 1500.00,
-    }
-}
-```
-## Comandos disponíveis
-
-php artisan nfse:clear-schemas
-
-
-## Erros comuns e como resolver
-
-### DOMDocument::schemaValidate(): Invalid Schema
-
-Verifique se o arquivo XSD está correto e acessível no caminho especificado. Além disso, confira se o XML está bem formado antes de validar contra o schema. Outra causa é a existência de RegEx no XSD que não são suportadas pelo PHP (ex: lookahead, lookbehind, etc). Nesse caso, será necessário ajustar o XSD para remover essas expressões. Ex:
-
-```xml
-<xs:pattern value="^(?!0{1,5}$)\d{1,5}$"/>
-deve ser alterado para
-<xs:pattern value="[0-9]{1,5}"/>
-```
-
-> Outra opção é remover a validação do schema, mas isso não é recomendado.
-
-### [RNG9999] Erro não catalogado
-
-Verifique se está enviando a propriedade correta no payload. Por exemplo, se o serviço espera `dpsXmlGZipB64` e você está enviando `nfseXmlGZipB64`, ocorrerá esse erro.
-
-### [RNG6110] Falha Schema Xml (Xml mal formado. System.NullReferenceException: Object reference not set to an instance of an object.\r\n   at Serpro.Sped.NFSe.Schemas.Controle.ControleValidarSchema.Validar(String xml, TipoDocumentoRequisicao tipoDocReq, ResultadoProcessamento resultado))
-
-Verifique se o XML está formatado corretamente e utilizando UTF-8. Além disso, confira se o XML está sendo assinado corretamente antes do envio.
-
-### [E6155] Xml declarado com prefixo de namespace.
-
-Provavelmente o XML está sendo gerado com o prefixo "ds:" após a assinatura. Resolva passando um prefixo vazio para na classe XMLSecurityDSig, como no exemplo abaixo:
-
-```php
-new XMLSecurityDSig('')
-```
-
-### [E6154] Xml não está utilizando codificação UTF-8.
-
-Verifique se o XML está sendo gerado com a codificação UTF-8 e com o header correto:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-```
-### [RNG6110] Falha Schema Xml (The 'versao' attribute is invalid - The value '1.00' is invalid according to its datatype 'http://www.sped.fazenda.gov.br/nfse:TVerNFSe' - The Pattern constraint failed.)
-
-Provavelmente houve uma mudança de versão e a versão que está sendo enviada não é mais válida. Verifique a versão correta no schema e ajuste o código para enviar a versão correta. Verificar:
-
-```
-config('services.nfse.version')
-```
-
-### [RNG6110] Falha Schema Xml (The element 'cServ' in namespace 'http://www.sped.fazenda.gov.br/nfse' has incomplete content. List of possible elements expected: 'cNBS' in namespace 'http://www.sped.fazenda.gov.br/nfse'.)
-
-Aparentemente o campo `cNBS` (Código Nacional de Atividade Econômica do Serviço) passou a ser obrigatório. Verifique o valor correto para o serviço prestado e envie esse campo no XML. Veja mais detalhes na portaria abaixo:
-
-https://www.econeteditora.com.br/bdi/port/p13/portaria1820_rfb_scs_anx_2013.php
-
+- [Documentação Técnica Completa](https://github.com/TiagoSilvaPereira/laravel-nfse/wiki)
