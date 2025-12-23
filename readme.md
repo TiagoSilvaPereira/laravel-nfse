@@ -87,6 +87,8 @@ Alguns exemplos de requests:
 - **Consultar Detalhes da NFS-e:** `GET /api/nfse/{id}`
 - **Obter PDF da NFS-e:** `GET /api/nfse/{id}/pdf`
 
+> **IMPORTANTE:** a API implementada não possui autenticação. Em um ambiente real, é crucial implementar mecanismos de segurança adequados, como OAuth2, API Keys ou JWT, para proteger os endpoints contra acessos não autorizados.
+
 # Como contribuir
 
 Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull requests com melhorias, correções de bugs ou novas funcionalidades.
