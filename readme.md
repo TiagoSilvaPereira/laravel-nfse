@@ -18,8 +18,6 @@ Este projeto está em estágio inicial e **NÃO deve ser utilizado em produção
 
 Não há garantias de funcionamento, segurança ou conformidade legal. Consulte sempre um contador ou especialista tributário antes de utilizar este código em ambientes reais.
 
-Além disso, o código pode conter bugs, falhas de segurança ou estar desatualizado em relação às normas vigentes. Use por sua conta e risco!
-
 **Não me responsabilizo por quaisquer problemas decorrentes do uso deste código. Ele é totalmente aberto para que você possa adaptá-lo conforme suas necessidades e aprender com ele.**
 
 # Como rodar o projeto
