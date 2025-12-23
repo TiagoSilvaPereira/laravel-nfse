@@ -22,6 +22,37 @@ Além disso, o código pode conter bugs, falhas de segurança ou estar desatuali
 
 **Não me responsabilizo por quaisquer problemas decorrentes do uso deste código. Ele é totalmente aberto para que você possa adaptá-lo conforme suas necessidades e aprender com ele.**
 
+# Como rodar o projeto
+
+1. Clone o repositório:
+
+```bash
+git clone https://github.com/TiagoSilvaPereira/laravel-nfse.git
+cd laravel-nfse
+```
+2. Instale as dependências via Composer:
+
+```bash
+composer install
+```
+3. Se necessário, configure a versão da NFSe no arquivo `.env`:
+
+```env
+NFSE_VERSION=1.01 # Valor padrão
+```
+
+4. Rode a Queue Worker para processar as emissões de NFS-e:
+
+```bash
+php artisan queue:work
+```
+
+5. E por fim rode o servidor local do Laravel:
+
+```bash
+php artisan serve
+```
+
 # Documentação
 
 Você pode acessar a documentação direto na Wiki do GitHub:
@@ -31,6 +62,30 @@ Você pode acessar a documentação direto na Wiki do GitHub:
 # Onde encontrar as collections de API?
 
 Utilizei o [Bruno](https://www.usebruno.com/) como cliente REST para testar a API. Você pode encontrar as collections exportadas na pasta `resources/collections/bruno`.
+
+Alguns exemplos de requests:
+
+- **Emitir NFS-e:** `POST /api/nfse`
+
+```json
+{
+    "company_id": 1,
+    "integration_id": "teste-1",
+    "customer": {
+        "name": "Nome de Exemplo",
+        "cpfCnpj": "12345678901"
+    },
+    "service": {
+        "code": "010101",
+        "nbs_code": "115021000",
+        "description": "Desenvolvimento de Software",
+        "amount": 1338.40
+    }
+}
+```
+
+- **Consultar Detalhes da NFS-e:** `GET /api/nfse/{id}`
+- **Obter PDF da NFS-e:** `GET /api/nfse/{id}/pdf`
 
 # Como contribuir
 
