@@ -174,16 +174,16 @@ class XmlBuilderService
         // # parâmetros municipais podem ser utilizados para obter a alíquota
         // # real do serviço. Consulte com seu contador as regras específicas
         // # e ajuste conforme necessário.
-        if (isset($serviceData['cTribNac'])) {
-            $cityCode = $this->company->municipality_code;
-            $serviceCode = $serviceData['cTribNac'];
+        // if (isset($serviceData['cTribNac'])) {
+        //     $cityCode = $this->company->municipality_code;
+        //     $serviceCode = $serviceData['cTribNac'];
             
-            $aliquotaData = $this->paramsService->getServiceAliquota($cityCode, $serviceCode, $competencia);
+        //     $aliquotaData = $this->paramsService->getServiceAliquota($cityCode, $serviceCode, $competencia);
             
-            if ($aliquotaData && isset($aliquotaData['Aliq'])) {
-                $aliquota = $aliquotaData['Aliq'];
-            }
-        }
+        //     if ($aliquotaData && isset($aliquotaData['Aliq'])) {
+        //         $aliquota = $aliquotaData['Aliq'];
+        //     }
+        // }
         
         $tributacao = [
             'tribISSQN' => 1, // Operação tributável
