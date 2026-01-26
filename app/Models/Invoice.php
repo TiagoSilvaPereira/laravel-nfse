@@ -57,4 +57,29 @@ class Invoice extends Model
             'payload' => $payload,
         ]);
     }
+
+    public function getRawNfseXmlAttributeFormatted(): ?string
+    {
+        $rawXml = $this->getRawNfseXmlAttribute();
+        if (!$rawXml) {
+            return null;
+        }
+
+        $dom = new \DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($rawXml);
+
+        return $dom->saveXML();
+    }
+
+    public function getRawNfseXmlAttribute(): ?string
+    {
+        if (!$this->xml_nfse) {
+            return null;
+        }
+
+        $decoded = base64_decode($this->xml_nfse);
+        return gzdecode($decoded);
+    }
 }
